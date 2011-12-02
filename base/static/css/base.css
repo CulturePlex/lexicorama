@@ -1,0 +1,60 @@
+@import url(http://fonts.googleapis.com/css?family=IM+Fell+DW+Pica|IM+Fell+DW+Pica+SC);
+/* Font styles
+font-family: 'IM Fell DW Pica SC', serif;
+font-family: 'IM Fell DW Pica', serif;
+-- Not using
+font-family: 'Artifika', serif;
+font-family: 'PT Serif', serif;
+font-family: 'IM Fell English', serif;
+*/
+
+body {
+    padding-top: 60px;
+    font-family: 'Georgia', serif;
+    font-size: 1em;
+}
+
+h1,h2,h3,h4,h5,h6,h7,.topbar {
+    font-family: 'IM Fell DW Pica SC', serif;
+}
+
+.logofont {
+    font-family: 'IM Fell DW Pica', serif;
+    font-size: 1.25em;
+}
+
+input[type="text"] {
+    font-family: 'IM Fell DW Pica', serif;
+    font-size: 1.25em;
+    height: 30px;
+    width: 100%;
+    color: gray;
+}
+
+input[type="text"]:focus {
+    color: #404040;
+}
+
+input[type="text"] {
+    font-family: 'IM Fell DW Pica', serif;
+    font-size: 1.25em;
+    height: 30px;
+    width: 100%;
+}
+
+.hero-unit {
+    padding: 25px;
+}
+
+.hero-unit label {
+    display: none;
+}
+
+dl dt {
+    font-weight: normal;
+}
+
+dl dd {
+    line-height: 50px;
+    padding-left: 30px;
+}

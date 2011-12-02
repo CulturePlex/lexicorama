@@ -1,0 +1,138 @@
+{% load i18n static %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+{% get_static_prefix as STATIC_PREFIX %}
+<html xml:lang="{{ LANGUAGE_CODE|slice:":2" }}"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:v="urn:schemas-microsoft-com:vml"
+      version="-//W3C//DTD XHTML 1.0 Strict//EN">
+
+<head>
+    <title>{{ PROJECT_NAME }} - {% block title %}{% trans "The Lexicon Database" %}{% endblock %}</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <meta name="author" content="The CulturePlex Lab.">
+    <meta name="resource-type" content="document">
+    <meta name="distribution" content="global">
+    <meta name="rating" content="general">
+    <meta name="robots" content="ALL">
+    <meta name="copyright" content="Copyright {{ CURRENT_DATE|date:"Y" }} CulturePlex Lab."> 
+    <meta name="description" content="{% trans "The Lexicon Database" %}"> 
+    <meta name="keywords" content="lexicon, lexico, linguistics, linguítica, database">
+    {% block extra_metas %}{% endblock %}
+    <link rel="icon" href="{{ STATIC_PREFIX }}img/favicon.ico"> 
+    <link rel="shortcut icon" href="{{ STATIC_PREFIX }}img/favicon.ico">
+    <link rel="apple-touch-icon" href="{{ STATIC_PREFIX }}img/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="{{ STATIC_PREFIX }}img/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="{{ STATIC_PREFIX }}img/apple-touch-icon-114x114.png">
+    <!-- HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link href="http://twitter.github.com/bootstrap/1.3.0/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_PREFIX }}css/base.css" /> 
+    {% block extra_css %} {% endblock %}
+    {% block extra_links %}{% endblock %}
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    {% block extra_scripts %}{% endblock %}
+</head>
+
+<body {% block body_attrs %}{% endblock %}>
+{% block body %}
+{% block startbody %}
+{% endblock %}
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="container-fluid">
+      <a class="brand" href="#">{{ PROJECT_NAME }}</a>
+      <ul class="nav">
+        <li class="active"><a href="#">{% trans "Entries" %}</a></li>
+        <li><a href="#about">{% trans "About" %}</a></li>
+        <li><a href="#contact">{% trans "Contact" %}</a></li>
+      </ul>
+      {% block login %}
+      <p class="pull-right"><a href="{% url login %}">admin</a></p>
+      {% endblock %}
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid">
+  <div class="sidebar">
+    <div class="well">
+      {% block sidebar %}
+      <h5>Sidebar</h5>
+      <ul>
+        <li><a href="#">Link</a></li>
+        <li><a href="#">Link</a></li>
+        <li><a href="#">Link</a></li>
+        <li><a href="#">Link</a></li>
+      </ul>
+      <h5>Sidebar</h5>
+      <ul>
+        <li><a href="#">Link</a></li>
+        <li><a href="#">Link</a></li>
+        <li><a href="#">Link</a></li>
+        <li><a href="#">Link</a></li>
+        <li><a href="#">Link</a></li>
+        <li><a href="#">Link</a></li>
+      </ul>
+      <h5>Sidebar</h5>
+      <ul>
+        <li><a href="#">Link</a></li>
+        <li><a href="#">Link</a></li>
+      </ul>
+    {% endblock %}
+    </div>
+  </div>
+  <div class="content">
+    <!-- Main hero unit for a primary marketing message or call to action -->
+    <div class="hero-unit">
+      {% block herounit %}
+      <h3>{% trans "Word" %}</h3>
+      <p>Vestibulum id ligula porta felis euismod semper. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+      <p><input type="text"/><a class="btn primary large">Learn more &raquo;</a></p>
+    {% endblock %}
+    </div>
+
+    <!-- Example row of columns -->
+    {% block content %}
+    <div class="row">
+      <div class="span6">
+        <h2>Heading</h2>
+        <p>Etiam porta sem malesuada magna mollis euismod. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+        <p><a class="btn" href="#">View details &raquo;</a></p>
+      </div>
+      <div class="span5">
+        <h2>Heading</h2>
+         <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+        <p><a class="btn" href="#">View details &raquo;</a></p>
+     </div>
+      <div class="span5">
+        <h2>Heading</h2>
+        <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+        <p><a class="btn" href="#">View details &raquo;</a></p>
+      </div>
+    </div>
+    {% endblock %}
+
+    <footer>
+    {% block footer %}
+      <p>
+        {{ CURRENT_DATE|date:"Y" }} &copy; {% trans "Copyright" %} by <a href="#">{{ PROJECT_NAME }}</a> & 
+        <a href="http://www.cultureplex.ca/">CulturePlex Lab</a>. <a href="#">{% trans "Some rights reserved" %}</a>.
+        <a href="#">{% trans "Terms" %}</a>.
+      </p>
+    {% endblock %}
+    </footer>
+  </div>
+</div>
+{% block endbody %}
+{% endblock %}
+{% endblock %}
+</body>
+<!--
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+<script type="text/javascript">
+    _uacct = "{{ GOOGLE_ANALYTICS_CODE }}";
+    urchinTracker();
+</script>
+-->
+</html>

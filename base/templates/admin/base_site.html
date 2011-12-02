@@ -1,0 +1,78 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block extrahead %}
+{{ block.super }}
+<!--<script type="text/javascript">-->
+<!--(function($) {-->
+<!--    init = function() {-->
+<!--        $("div#language-form select#setlang").change(function() {-->
+<!--            $("div#language-form").submit();-->
+<!--        });-->
+<!--    }-->
+<!--    $(document).ready(init);-->
+<!--})(django.jQuery);-->
+<!--</script>-->
+<style>
+<!--
+#language-form {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.95em 5px;
+    font-size: 11px;
+    text-align: right;
+    font-family: "Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif";
+}
+
+#language-form input,#language-form select {
+    border: none;
+    text-decoration: none;
+    color: white;
+    background: none;
+    padding: 0px;
+}
+
+#language-form input {
+    margin-top: -1px;
+}
+
+#language-form select {
+    width: 100px;
+    height: 18px;
+    margin-top: 0px;
+}
+
+#language-form input:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#user-tools {
+    right: 125px;
+}
+-->
+</style>
+{% endblock %}
+
+{% block title %}{{ title }} | {{ PROJECT_NAME }} {% trans 'site admin' %}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">{{ PROJECT_NAME }}: {% trans 'Administration' %}</h1>
+{% endblock %}
+
+{% block nav-global %}
+<div id="language-form">
+    <form action="/i18n/setlang/" method="post" id="setlang">
+        {% csrf_token %}
+        / <input name="next" type="hidden" value="{{ next_page }}" />
+        <select name="language" id="language-form-setlang">
+        {% get_language_info_list for LANGUAGES as languages %}
+        {% for language in languages %}
+            <option {% if LANGUAGE_CODE == language.code %}selected="selected"{% endif %} value="{{ language.code }}">{{ language.name_local }} ({{ language.code }})</option>
+        {% endfor %}
+        </select>
+        <input type="submit" value="Go" />
+    </form>
+</div>
+{% endblock %}
