@@ -19,6 +19,7 @@ class LexicalEntry(models.Model):
         "demadj": ['gender', 'number'],
         "dempron": ['gender', 'number'],
         "excl": ['gender', 'number'],
+        "indefpron": ['gender', 'number'],
         "int": ['gender', 'number'],
         "conj": ['conj_type'],
         "noun": ['noun_degree', 'noun_interpretation', 'noun_type',
@@ -26,8 +27,9 @@ class LexicalEntry(models.Model):
         "possadj": ['gender', 'number', 'person'],
         "posspron": ['gender', 'number', 'person'],
         "prep": ['prep_form'],
-        "pron": ['pron_type', 'gender', 'number', 'person'],
-        "quan": ['quan_type'],
+        "pron": ['pron_case', 'gender', 'number', 'person', 'pron_polite'],
+        "relpron": ['gender', 'number'],
+        "quan": ['quan_type', 'gender', 'number'],
         "verb": ['verb_base', 'verb_conjugation', 'verb_mood',
                  'verb_reflexiveness', 'verb_tense', 'verb_transitivity',
                  'verb_type', 'verb_class', 'number', 'person'],
@@ -39,12 +41,14 @@ class LexicalEntry(models.Model):
     CATEGORY_DEMONSTRATIVE_ADJECTIVE = "demadj"
     CATEGORY_DEMONSTRATIVE_PRONOUN = "dempron"
     CATEGORY_EXCLAMATIVE = "excl"
+    CATEGORY_INDEFINITE_PRONOUN = "indefpron"
     CATEGORY_INTERROGATIVE = "int"
     CATEGORY_NOUN = "noun"
     CATEGORY_POSSESIVE_ADJECTIVE = "possadj"
     CATEGORY_POSSESIVE_PRONOUN = "posspron"
     CATEGORY_PREPOSITION = "prep"
     CATEGORY_PERSONAL_PRONOUN = "pron"
+    CATEGORY_RELATIVE_PRONOUN = "relpron"
     CATEGORY_QUANTIFIER = "quan"
     CATEGORY_VERB = "verb"
     CATEGORY_CHOICES = (
@@ -55,12 +59,14 @@ class LexicalEntry(models.Model):
         (CATEGORY_DEMONSTRATIVE_ADJECTIVE, _("Demonstrative Adjective")),
         (CATEGORY_DEMONSTRATIVE_PRONOUN, _("Demonstrative Pronoun")),
         (CATEGORY_EXCLAMATIVE, _("Exclamative")),
+        (CATEGORY_INDEFINITE_PRONOUN, _("Indefinite Pronoun")),
         (CATEGORY_INTERROGATIVE, _("Interrogative")),
         (CATEGORY_NOUN, _("Noun")),
         (CATEGORY_POSSESIVE_ADJECTIVE, _("Possesive Adjective")),
         (CATEGORY_POSSESIVE_PRONOUN, _("Possesive Pronoun")),
         (CATEGORY_PREPOSITION, _("Preposition")),
         (CATEGORY_PERSONAL_PRONOUN, _("Personal Pronoun")),
+        (CATEGORY_RELATIVE_PRONOUN, _("Relative Pronoun")),
         (CATEGORY_QUANTIFIER, _("Quantifier")),
         (CATEGORY_VERB, _("Verb")),
     )
@@ -77,7 +83,7 @@ class LexicalEntry(models.Model):
     )
     gender = models.CharField(_("Gender"), max_length=10, blank=True,
                               choices=GENDER_CHOICES, null=True)
-    NUMBER_PLURAL = "plu"
+    NUMBER_PLURAL = "plur"
     NUMBER_SINGULAR = "sing"
     NUMBER_INVARIABLE = "inv"
     NUMBER_CHOICES = (
@@ -110,10 +116,10 @@ class LexicalEntry(models.Model):
     adj_degree = models.CharField(_("Degree"), max_length=10,
                                         choices=ADJ_DEGREE_CHOICES, blank=True,
                                         null=True)
-    ADJ_INTERP_QUANTIFICABLE = "quant"
+    ADJ_INTERP_QUANTIFIABLE = "quant"
     ADJ_INTERP_DESCRIPTIVE = "descr"
     ADJ_INTERP_CHOICES = (
-        (ADJ_INTERP_QUANTIFICABLE, _("Quantificable")),
+        (ADJ_INTERP_QUANTIFIABLE, _("Quantificable")),
         (ADJ_INTERP_DESCRIPTIVE, _("Descriptive")),
     )
     adj_interpretation = models.CharField(_("Interpretation"), max_length=10,
@@ -225,16 +231,27 @@ class LexicalEntry(models.Model):
         choices=PREP_FORM_CHOICES, blank=True, null=True)
     # Pronouns
     # is_pronoun = models.BooleanField(_("Pronoun"), default=False)
-    PRON_TYPE_SUBJECT = "sub"
-    PRON_TYPE_OBJECT = "obj"
-    PRON_TYPE_OBLIQUE = "obl"
-    PRON_TYPE_CHOICES = (
-        (PRON_TYPE_SUBJECT, _("Subject")),
-        (PRON_TYPE_OBJECT, _("Object")),
-        (PRON_TYPE_OBLIQUE, _("Oblique")),
+    PRON_CASE_NOMINATIVE = "nom"
+    PRON_CASE_ACCUSATIVE = "acc"
+    PRON_CASE_DATIVE = "dat"
+    PRON_CASE_OBLIQUE = "obl"
+    PRON_CASE_CHOICES = (
+        (PRON_CASE_NOMINATIVE , _("Nominative")),
+        (PRON_CASE_ACCUSATIVE, _("Accusative")),
+        (PRON_CASE_DATIVE, _("Dative")),
+        (PRON_CASE_OBLIQUE, _("Oblique")),
     )
-    pron_type = models.CharField(_("Type"), max_length=10,
-                                    choices=PRON_TYPE_CHOICES, blank=True,
+    pron_case = models.CharField(_("Case"), max_length=10,
+                                    choices=PRON_CASE_CHOICES, blank=True,
+                                    null=True)
+    PRON_POLITE_REGULAR = "reg"
+    PRON_POLITE_POLITE = "pol"
+    PRON_POLITE_CHOICES = (
+        (PRON_POLITE_REGULAR , _("Nominative")),
+        (PRON_POLITE_POLITE, _("Accusative")),
+    )
+    pron_polite = models.CharField(_("Politeness"), max_length=10,
+                                    choices=PRON_POLITE_CHOICES, blank=True,
                                     null=True)
     # Quantifiers
     # is_quantifier = models.BooleanField(_("Quantifier"), default=False)
@@ -257,7 +274,7 @@ class LexicalEntry(models.Model):
                                          null=True)
     # Verbs
     # is_verb = models.BooleanField(_("Verb"), default=False)
-    VERB_BASE_COPULATIVE = "cod"
+    VERB_BASE_COPULATIVE = "cop"
     VERB_BASE_PREDICATIVE = "pred"
     VERB_BASE_CHOICES = (
         (VERB_BASE_COPULATIVE, _("Copulative")),
@@ -280,7 +297,7 @@ class LexicalEntry(models.Model):
     VERB_MOOD_IMPERATIVE = "imp"
     VERB_MOOD_INFINITIVE = "inf"
     VERB_MOOD_GERUND = "ger"
-    VERB_MOOD_PARTICIPLE = "part"
+    VERB_MOOD_PARTICIPLE = "par"
     VERB_MOOD_CHOICES = (
         (VERB_MOOD_INDICATIVE, _("Indicative")),
         (VERB_MOOD_SUBJUNCTIVE, _("Subjunctive")),
@@ -293,7 +310,7 @@ class LexicalEntry(models.Model):
                                  choices=VERB_MOOD_CHOICES, blank=True,
                                  null=True)
     VERB_REFL_REFLEXIVE = "refl"
-    VERB_REFL_NONREFLEXIVE = "nonrefl"
+    VERB_REFL_NONREFLEXIVE = "notrefl"
     VERB_REFL_CHOICES = (
         (VERB_REFL_REFLEXIVE, _("Relexive")),
         (VERB_REFL_NONREFLEXIVE, _("Non Reflexive")),
@@ -316,8 +333,8 @@ class LexicalEntry(models.Model):
     )
     verb_tense = models.CharField(_("Tense"), max_length=10,
         choices=VERB_TENSE_CHOICES, blank=True, null=True)
-    VERB_TRANS_TRANSITIVE = "tran"
-    VERB_TRANS_INTRANSITIVE = "intran"
+    VERB_TRANS_TRANSITIVE = "trans"
+    VERB_TRANS_INTRANSITIVE = "intrans"
     VERB_TRANS_CHOICES = (
         (VERB_TRANS_TRANSITIVE, _("Transitive")),
         (VERB_TRANS_INTRANSITIVE, _("Intransitive")),
@@ -338,9 +355,9 @@ class LexicalEntry(models.Model):
     VERB_CLASS_ER = "er"
     VERB_CLASS_IR = "ir"
     VERB_CLASS_CHOICES = (
-        (VERB_CLASS_AR, _("-ar")),
-        (VERB_CLASS_ER, _("-er")),
-        (VERB_CLASS_IR, _("-ir")),
+        (VERB_CLASS_AR, _("First (-ar)")),
+        (VERB_CLASS_ER, _("Second (-er)")),
+        (VERB_CLASS_IR, _("Third (-ir)")),
     )
     verb_class = models.CharField(_("Class"), max_length=10,
                                   choices=VERB_CLASS_CHOICES, blank=True,

@@ -12,7 +12,7 @@ class Command(BaseCommand):
     Loads verbs files from DRAE into LexicalEntry objects
     
     Usage:
-    python manage.py load_verbs /tmp/verbs/verb 2 100 .txt
+    python manage.py loadverbs /tmp/verbs/verb 2 100 .txt
     """
     can_import_settings = True
 
