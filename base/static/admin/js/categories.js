@@ -2,8 +2,8 @@
 
     var fields = ['gender', 'number', 'person', 'adj_degree', 'adv_meaning',
                   'adj_interpretation', 'art_type', 'conj_type', 'noun_degree',
-                  'noun_interpretation', 'noun_type', 'prep_form',
-                  'pron_type', 'quan_type', 'verb_base', 'verb_conjugation',
+                  'noun_interpretation', 'noun_type', 'prep_form', 'pron_polite',
+                  'pron_case', 'quan_type', 'verb_base', 'verb_conjugation',
                   'verb_mood', 'verb_reflexiveness', 'verb_tense', 'verb_class',
                   'verb_transitivity', 'verb_type'];
     var categories = {
