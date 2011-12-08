@@ -9,13 +9,13 @@ class LexicalEntryAdmin(admin.ModelAdmin):
 
     readonly_fields = ('frequency', )
     exclude = ('user', 'frequency')
-    search_fields = ('word', 'headword', 'user__name',
-                     'description')
-    list_display = ('word', 'headword', 'category', 'features',
+    search_fields = ('word', 'lemma', 'user__username',
+                     'definition')
+    list_display = ('word', 'lemma', 'category', 'features',
                     'frequency', 'user', 'date')
     list_filter = ('user', 'date', 'category')
     date_hierarchy = 'date'
-    # list_editable = ('headword', 'category', 'gender', 'number', 'person')
+    # list_editable = ('lemma', 'category', 'gender', 'number', 'person')
     save_as = False
 
     def save_model(self, request, obj, form, change):

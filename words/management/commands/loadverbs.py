@@ -28,7 +28,7 @@ class Command(BaseCommand):
         except IndexError:
             raise CommandError("All the parameters must be provided.")
         spaces = re.compile(r"[ ]+")
-        user = User.objects.get(username="admin")
+        user = User.objects.all()[0]
         atones_pronouns = ["me", "te", "se", "nos", "os"]
         defective = [u"abarse", u"abocanar", u"acaecer", u"acantelear",
                      u"acontecer", u"adir", u"alborecer", u"algarecear",
@@ -55,7 +55,7 @@ class Command(BaseCommand):
                         line = " ".join(spaces.split(file_line.replace("_", " ").strip())).split("|")[1:-1]
                         lines.append(line)
                 non_personal, personal, imperative = self.split_mood(lines)
-                headword = ""
+                lemma = ""
                 reflexiveness = ""
                 klass = ""
                 vtype = LexicalEntry.VERB_TYPE_MAIN
@@ -63,10 +63,10 @@ class Command(BaseCommand):
                     row_type = row[0].strip().lower()
                     if u"infinitivo" in row_type:
                         verb = unicode(row[1].strip().decode("utf8"))
-                        headword = verb
+                        lemma = verb
                         entry = {
                             "word": verb,
-                            "headword": headword,
+                            "lemma": lemma,
                             "category": LexicalEntry.CATEGORY_VERB,
                         }
                         if verb == u"haber":
@@ -105,7 +105,7 @@ class Command(BaseCommand):
                                 verb = verb.strip()
                                 entry = {
                                     "word": verb,
-                                    "headword": headword,
+                                    "lemma": lemma,
                                     "category": LexicalEntry.CATEGORY_VERB,
                                 }
                                 entry["verb_mood"] = LexicalEntry.VERB_MOOD_PARTICIPLE
@@ -117,7 +117,7 @@ class Command(BaseCommand):
                         elif verbs:
                             entry = {
                                 "word": verbs,
-                                "headword": headword,
+                                "lemma": lemma,
                                 "category": LexicalEntry.CATEGORY_VERB,
                             }
                             entry["verb_mood"] = LexicalEntry.VERB_MOOD_PARTICIPLE
@@ -133,7 +133,7 @@ class Command(BaseCommand):
                             for verb_suffix in atones_pronouns:
                                 entry = {
                                     "word": u"%s%s" % (verb_stem, verb_suffix),
-                                    "headword": headword,
+                                    "lemma": lemma,
                                     "category": LexicalEntry.CATEGORY_VERB,
                                 }
                                 entry["verb_mood"] = LexicalEntry.VERB_MOOD_GERUND
@@ -145,7 +145,7 @@ class Command(BaseCommand):
                         elif verbs:
                             entry = {
                                 "word": verbs,
-                                "headword": headword,
+                                "lemma": lemma,
                                 "category": LexicalEntry.CATEGORY_VERB,
                             }
                             entry["verb_mood"] = LexicalEntry.VERB_MOOD_GERUND
@@ -182,20 +182,20 @@ class Command(BaseCommand):
                                 number = LexicalEntry.NUMBER_SINGULAR
                                 if person_count > 3:
                                     number = LexicalEntry.NUMBER_PLURAL
-                                if headword in defective:
+                                if lemma in defective:
                                     person = 3
                                 else:
                                     person = str((person_count % 3) + 1)
                                 for verb in words.replace(" o ", " / ").replace(" u ", " / ").split("/"):
+                                    verb = verb.strip()
                                     if u" " in verb:
                                         for pron in atones_pronouns:
                                             if u"%s " % pron in verb:
-                                                verb = verb.replace(pron, "", 1)
-                                    verb = verb.strip()
+                                                verb = verb.replace(pron, "", 1).strip()
                                     if verb and verb not in atones_pronouns:
                                         entry = {
                                             "word": verb,
-                                            "headword": headword,
+                                            "lemma": lemma,
                                             "category": LexicalEntry.CATEGORY_VERB,
                                         }
                                         entry["verb_mood"] = mood
@@ -226,7 +226,7 @@ class Command(BaseCommand):
                         verb = verb.strip()
                         entry = {
                             "word": verb,
-                            "headword": headword,
+                            "lemma": lemma,
                             "category": LexicalEntry.CATEGORY_VERB,
                         }
                         entry["verb_mood"] = LexicalEntry.VERB_MOOD_IMPERATIVE
@@ -271,7 +271,7 @@ class Command(BaseCommand):
     def print_entry(self, entry, user):
         dic = {
             "category": entry.pop("category"),
-            "lemma": entry.pop("headword"),
+            "lemma": entry.pop("lemma"),
             "flexion": entry.pop("word"),
             "msd": entry,
         }

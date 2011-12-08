@@ -5,8 +5,8 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class LexicalEntry(models.Model):
-    word = models.CharField(_("Word"), max_length=100)
-    headword = models.CharField(_("Headword"), max_length=100)
+    word = models.CharField(_("Word"), max_length=100, db_index=True)
+    lemma = models.CharField(_("Lemma"), max_length=100)
     definition = models.TextField(_("Definition"), null=True, blank=True)
     user = models.ForeignKey(User, verbose_name=_("User"),
                              related_name="words")
@@ -14,7 +14,7 @@ class LexicalEntry(models.Model):
     frequency = models.FloatField(_("Frequency"), default=0)
     eagle = models.CharField(_("EAGLE"), max_length=20, null=True, blank=True)
     CATEGORY_FIELDS = {
-        "adj": ['adj_degree', 'adj_interpretation', 'gender', 'number'],
+        "adj": ['adj_degree', 'adj_interp', 'gender', 'number'],
         "adv": ['adv_meaning'],
         "art": ['art_type', 'gender', 'number'],
         "demadj": ['gender', 'number'],
@@ -23,7 +23,7 @@ class LexicalEntry(models.Model):
         "indefpron": ['gender', 'number'],
         "int": ['gender', 'number'],
         "conj": ['conj_type'],
-        "noun": ['noun_degree', 'noun_interpretation', 'noun_type',
+        "noun": ['noun_degree', 'noun_interp', 'noun_type',
                  'gender', 'number'],
         "possadj": ['gender', 'number', 'person'],
         "posspron": ['gender', 'number', 'person'],
@@ -31,8 +31,8 @@ class LexicalEntry(models.Model):
         "pron": ['pron_case', 'gender', 'number', 'person', 'pron_polite'],
         "relpron": ['gender', 'number'],
         "quan": ['quan_type', 'gender', 'number'],
-        "verb": ['verb_base', 'verb_conjugation', 'verb_mood',
-                 'verb_reflexiveness', 'verb_tense', 'verb_transitivity',
+        "verb": ['verb_base', 'verb_conj', 'verb_mood',
+                 'verb_refl', 'verb_tense', 'verb_trans',
                  'verb_type', 'verb_class', 'number', 'person'],
     }
     CATEGORY_ADJECTIVE = "adj"
@@ -123,9 +123,9 @@ class LexicalEntry(models.Model):
         (ADJ_INTERP_QUANTIFIABLE, _("Quantificable")),
         (ADJ_INTERP_DESCRIPTIVE, _("Descriptive")),
     )
-    adj_interpretation = models.CharField(_("Interpretation"), max_length=10,
-                                   choices=ADJ_INTERP_CHOICES, blank=True,
-                                   null=True)
+    adj_interp = models.CharField(_("Interpretation"), max_length=10,
+                                  choices=ADJ_INTERP_CHOICES, blank=True,
+                                  null=True)
     # Adverbs
     # is_adverb = models.BooleanField(_("Adverb"), default=False)
     ADV_MEANING_PLACE = "place"
@@ -202,7 +202,7 @@ class LexicalEntry(models.Model):
         (NOUN_INTERP_COUNTABLE, _("Countable")),
         (NOUN_INTERP_MASSIVE, _("Massive")),
     )
-    noun_interpretation = models.CharField(_("Interpretation"), max_length=10,
+    noun_interp = models.CharField(_("Interpretation"), max_length=10,
                                    choices=NOUN_INTERP_CHOICES, blank=True,
                                    null=True)
     NOUN_TYPE_COMMON = "comm"
@@ -243,8 +243,8 @@ class LexicalEntry(models.Model):
         (PRON_CASE_OBLIQUE, _("Oblique")),
     )
     pron_case = models.CharField(_("Case"), max_length=10,
-                                    choices=PRON_CASE_CHOICES, blank=True,
-                                    null=True)
+                                 choices=PRON_CASE_CHOICES, blank=True,
+                                 null=True)
     PRON_POLITE_REGULAR = "reg"
     PRON_POLITE_POLITE = "pol"
     PRON_POLITE_CHOICES = (
@@ -290,9 +290,9 @@ class LexicalEntry(models.Model):
         (VERB_CONJ_REGULAR, _("Regular")),
         (VERB_CONJ_IRREGULAR, _("Irregular")),
     )
-    verb_conjugation = models.CharField(_("Conjugation"), max_length=10,
-                                        choices=VERB_CONJ_CHOICES, blank=True,
-                                        null=True)
+    verb_conj = models.CharField(_("Conjugation"), max_length=10,
+                                 choices=VERB_CONJ_CHOICES, blank=True,
+                                 null=True)
     VERB_MOOD_INDICATIVE = "ind"
     VERB_MOOD_SUBJUNCTIVE = "sub"
     VERB_MOOD_IMPERATIVE = "imp"
@@ -316,10 +316,10 @@ class LexicalEntry(models.Model):
         (VERB_REFL_REFLEXIVE, _("Relexive")),
         (VERB_REFL_NONREFLEXIVE, _("Non Reflexive")),
     )
-    verb_reflexiveness = models.CharField(_("Reflexiveness"),
-                                          max_length=10,
-                                          choices=VERB_REFL_CHOICES,
-                                          blank=True, null=True)
+    verb_refl = models.CharField(_("Reflexiveness"),
+                                 max_length=10,
+                                 choices=VERB_REFL_CHOICES,
+                                 blank=True, null=True)
     VERB_TENSE_PRESENT = "pres"
     VERB_TENSE_PRETERIT = "pret"
     VERB_TENSE_IMPERFECT = "imperf"
@@ -340,9 +340,9 @@ class LexicalEntry(models.Model):
         (VERB_TRANS_TRANSITIVE, _("Transitive")),
         (VERB_TRANS_INTRANSITIVE, _("Intransitive")),
     )
-    verb_transitivity = models.CharField(_("Transivity"), max_length=10,
-                                        choices=VERB_TRANS_CHOICES, blank=True,
-                                        null=True)
+    verb_trans = models.CharField(_("Transivity"), max_length=10,
+                                  choices=VERB_TRANS_CHOICES, blank=True,
+                                  null=True)
     VERB_TYPE_MAIN = "main"
     VERB_TYPE_AUXILIAR = "aux"
     VERB_TYPE_CHOICES = (
@@ -365,8 +365,25 @@ class LexicalEntry(models.Model):
                                   null=True)
 
     class Meta:
-        ordering = ["headword", "word", "frequency", "date"]
-        unique_together = ["word", "headword", "category"]
+        ordering = ["lemma", "word", "frequency", "date"]
+        unique_together = (
+            ('word', 'lemma', 'category', 'adj_degree', 'adj_interp',
+                'gender', 'number'),
+            ('word', 'lemma', 'category', 'adv_meaning'),
+            ('word', 'lemma', 'category', 'art_type', 'gender', 'number'),
+            # ('word', 'lemma', 'category', 'gender', 'number'),
+            ('word', 'lemma', 'category', 'conj_type'),
+            ('word', 'lemma', 'category', 'noun_degree', 'noun_interp',
+                'noun_type', 'gender', 'number'),
+            # ('word', 'lemma', 'category', 'gender', 'number', 'person'),
+            ('word', 'lemma', 'category', 'prep_form'),
+            ('word', 'lemma', 'category', 'pron_case', 'gender', 'number',
+                'person', 'pron_polite'),
+            ('word', 'lemma', 'category', 'quan_type', 'gender', 'number'),
+            ('word', 'lemma', 'category', 'verb_base', 'verb_conj',
+                'verb_mood','verb_refl', 'verb_tense', 'verb_trans',
+                'verb_type', 'verb_class', 'number', 'person')
+        )
         verbose_name = _("Lexical Entry")
         verbose_name_plural = _("Lexical Entries")
 

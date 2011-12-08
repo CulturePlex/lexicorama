@@ -2,23 +2,32 @@
 import json
 import re
 
+from optparse import make_option
+
 from django.db import transaction
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
+from django.db.utils import IntegrityError
 
 from words.models import LexicalEntry
 
 
 class Command(BaseCommand):
-    args = "prefix start end suffix"
-    help = """
-    Loads a lexicon file in JSON. The options --<category> or --no-<category>
-    can be used, but they are mutually exclusive.
-        --(no)-%s
+    option_list = BaseCommand.option_list + (
+        make_option('--no-verbs',
+            action='store_true',
+            dest='no_verbs',
+            default=False,
+            help='Ignore any verb in the load processself.'),
+        make_option('--only-verbs',
+            action='store_true',
+            dest='only_verbs',
+            default=False,
+            help='Loads only verbs.'),
 
-    Usage:
-    python manage.py loadlexicon /path/to/lexicon.json --no-verb
-    """ % "\n       --(no)-".join(Lexical.CATEGORY_FIELDS.keys())
+    )
+    args = "prefix start end suffix"
+    help = "\tLoads a lexicon file in JSON."
     can_import_settings = True
 
     def handle(self, *args, **options):
@@ -30,28 +39,35 @@ class Command(BaseCommand):
         except IOError, e:
             self.stdout.write("File not found: \"%s\"\n" % file_name)
         lines = []
-        user = User.objects.get(username="admin")
+        user = User.objects.all()[0]
         cont = 0
         join_args = " ".join(args[1:])
         with transaction.commit_on_success():
             for file_line in file_descr:
                 line = json.loads(file_line)
                 category = line["category"].lower()
-                if (("--no-" in join_args and  "--no-" % category not in args)
-                    or ("--no-" not in join_args and "--" % category in args)):
+                if ((options["only_verbs"] and category == "verb")
+                    or (options["no_verbs"] and category != "verb")):
                     entry = LexicalEntry()
                     entry.user = user
                     entry.word = line["flexion"]
-                    entry.headword = line["lemma"]
-                    entry.eagle = line["eagle_code"]
+                    entry.lemma = line["lemma"]
+                    entry.eagle = line.get("eagle_code", line.get("eagle", None))
+                    entry.frequency = line.get("frequency", 0.0)
                     entry.category = category
                     for k, v in line["msd"].items():
-                        if hasattr(entry, k) and v.strip():
+                        if v and hasattr(entry, k) and v.strip():
                             try:
                                 setattr(entry, k, v.strip())
                             except e:
                                 print e, entry, line
                     cont += 1
                     if cont % 1000 == 0:
-                        print u"... %s (%s) " % (cont, line["flexion"])
-                    entry.save()
+                        self.stdout.write(u"... %s (%s)\n" \
+                                          % (cont, line["flexion"]))
+                    try:
+                        entry.save()
+                    except IntegrityError, e:
+                        self.stdout.write(u"-- ERROR: %s.\n\t%s\n" \
+                                          % (line, e))
+

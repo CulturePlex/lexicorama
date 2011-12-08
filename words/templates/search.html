@@ -46,7 +46,7 @@
 {% for entry in entries %}
     {% autoescape off %}
     <dt>
-        <span class="logofont">{{ entry.word }}</span>. {{ entry.get_category_display }}
+        <span class="logofont">{{ entry.word }}</span>. {{ entry.get_category_display }} ({{ entry.lemma }})
     </dt>
     <dd>
         {{ entry.get_features_display }}
