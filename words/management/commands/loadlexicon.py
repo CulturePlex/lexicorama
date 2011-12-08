@@ -12,11 +12,13 @@ from words.models import LexicalEntry
 class Command(BaseCommand):
     args = "prefix start end suffix"
     help = """
-    Loads a lexicon file in JSON
-    
+    Loads a lexicon file in JSON. The options --<category> or --no-<category>
+    can be used, but they are mutually exclusive.
+        --(no)-%s
+
     Usage:
-    python manage.py loadlexicon /path/to/lexicon.json
-    """
+    python manage.py loadlexicon /path/to/lexicon.json --no-verb
+    """ % "\n       --(no)-".join(Lexical.CATEGORY_FIELDS.keys())
     can_import_settings = True
 
     def handle(self, *args, **options):
@@ -30,21 +32,26 @@ class Command(BaseCommand):
         lines = []
         user = User.objects.get(username="admin")
         cont = 0
+        join_args = " ".join(args[1:])
         with transaction.commit_on_success():
             for file_line in file_descr:
                 line = json.loads(file_line)
-                entry = LexicalEntry()
-                entry.user = user
-                entry.word = line["flexion"]
-                entry.headword = line["lemma"]
-                entry.category = line["category"].lower()
-                for k, v in line["msd"].items():
-                    if hasattr(entry, k) and v.strip():
-                        try:
-                            setattr(entry, k, v.strip())
-                        except e:
-                            print e, entry, line
-                cont += 1
-                if cont % 1000 == 0:
-                    print u"... %s (%s) " % (cont, line["flexion"])
-                entry.save()
+                category = line["category"].lower()
+                if (("--no-" in join_args and  "--no-" % category not in args)
+                    or ("--no-" not in join_args and "--" % category in args)):
+                    entry = LexicalEntry()
+                    entry.user = user
+                    entry.word = line["flexion"]
+                    entry.headword = line["lemma"]
+                    entry.eagle = line["eagle_code"]
+                    entry.category = category
+                    for k, v in line["msd"].items():
+                        if hasattr(entry, k) and v.strip():
+                            try:
+                                setattr(entry, k, v.strip())
+                            except e:
+                                print e, entry, line
+                    cont += 1
+                    if cont % 1000 == 0:
+                        print u"... %s (%s) " % (cont, line["flexion"])
+                    entry.save()

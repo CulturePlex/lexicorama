@@ -12,6 +12,7 @@ class LexicalEntry(models.Model):
                              related_name="words")
     date = models.DateTimeField(_("Date"), auto_now=True)
     frequency = models.FloatField(_("Frequency"), default=0)
+    eagle = models.CharField(_("EAGLE"), max_length=20, null=True, blank=True)
     CATEGORY_FIELDS = {
         "adj": ['adj_degree', 'adj_interpretation', 'gender', 'number'],
         "adv": ['adv_meaning'],
@@ -310,7 +311,7 @@ class LexicalEntry(models.Model):
                                  choices=VERB_MOOD_CHOICES, blank=True,
                                  null=True)
     VERB_REFL_REFLEXIVE = "refl"
-    VERB_REFL_NONREFLEXIVE = "notrefl"
+    VERB_REFL_NONREFLEXIVE = "nonrefl"
     VERB_REFL_CHOICES = (
         (VERB_REFL_REFLEXIVE, _("Relexive")),
         (VERB_REFL_NONREFLEXIVE, _("Non Reflexive")),
@@ -350,7 +351,7 @@ class LexicalEntry(models.Model):
     )
     verb_type = models.CharField(_("Type"), max_length=10,
                                  choices=VERB_TYPE_CHOICES, blank=True,
-                                 null=True)
+                                 null=True, default=VERB_TYPE_MAIN)
     VERB_CLASS_AR = "ar"
     VERB_CLASS_ER = "er"
     VERB_CLASS_IR = "ir"
@@ -364,7 +365,8 @@ class LexicalEntry(models.Model):
                                   null=True)
 
     class Meta:
-        ordering = ["word", "date", "frequency"]
+        ordering = ["headword", "word", "frequency", "date"]
+        unique_together = ["word", "headword", "category"]
         verbose_name = _("Lexical Entry")
         verbose_name_plural = _("Lexical Entries")
 
