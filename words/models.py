@@ -21,6 +21,7 @@ class LexicalEntry(models.Model):
         "dempron": ['gender', 'number'],
         "excl": ['gender', 'number'],
         "indefpron": ['gender', 'number'],
+        "interj": [],
         "int": ['gender', 'number'],
         "conj": ['conj_type'],
         "noun": ['noun_degree', 'noun_interp', 'noun_type',
@@ -32,7 +33,7 @@ class LexicalEntry(models.Model):
         "relpron": ['gender', 'number'],
         "quan": ['quan_type', 'gender', 'number'],
         "verb": ['verb_base', 'verb_conj', 'verb_mood',
-                 'verb_refl', 'verb_tense', 'verb_trans',
+                 'verb_prnl', 'verb_tense', 'verb_trans',
                  'verb_type', 'verb_class', 'number', 'person'],
     }
     CATEGORY_ADJECTIVE = "adj"
@@ -52,6 +53,7 @@ class LexicalEntry(models.Model):
     CATEGORY_RELATIVE_PRONOUN = "relpron"
     CATEGORY_QUANTIFIER = "quan"
     CATEGORY_VERB = "verb"
+    CATEGORY_INTERJECTION = "interj"
     CATEGORY_CHOICES = (
         (CATEGORY_ADJECTIVE, _("Adjective")),
         (CATEGORY_ADVERB, _("Adverb")),
@@ -61,6 +63,7 @@ class LexicalEntry(models.Model):
         (CATEGORY_DEMONSTRATIVE_PRONOUN, _("Demonstrative Pronoun")),
         (CATEGORY_EXCLAMATIVE, _("Exclamative")),
         (CATEGORY_INDEFINITE_PRONOUN, _("Indefinite Pronoun")),
+        (CATEGORY_INTERJECTION, _("Interjection")),
         (CATEGORY_INTERROGATIVE, _("Interrogative")),
         (CATEGORY_NOUN, _("Noun")),
         (CATEGORY_POSSESIVE_ADJECTIVE, _("Possesive Adjective")),
@@ -310,15 +313,15 @@ class LexicalEntry(models.Model):
     verb_mood = models.CharField(_("Mood"), max_length=10,
                                  choices=VERB_MOOD_CHOICES, blank=True,
                                  null=True)
-    VERB_REFL_REFLEXIVE = "refl"
-    VERB_REFL_NONREFLEXIVE = "nonrefl"
-    VERB_REFL_CHOICES = (
-        (VERB_REFL_REFLEXIVE, _("Relexive")),
-        (VERB_REFL_NONREFLEXIVE, _("Non Reflexive")),
+    VERB_PRNL_PRONOMINAL = "prnl"
+    VERB_PRNL_NONPRONOMINAL = "nonprnl"
+    VERB_PRNL_CHOICES = (
+        (VERB_PRNL_PRONOMINAL, _("Pronominal")),
+        (VERB_PRNL_NONPRONOMINAL, _("Non Pronominal")),
     )
-    verb_refl = models.CharField(_("Reflexiveness"),
+    verb_prnl = models.CharField(_("Pronominality"),
                                  max_length=10,
-                                 choices=VERB_REFL_CHOICES,
+                                 choices=VERB_PRNL_CHOICES,
                                  blank=True, null=True)
     VERB_TENSE_PRESENT = "pres"
     VERB_TENSE_PRETERIT = "pret"
@@ -381,7 +384,7 @@ class LexicalEntry(models.Model):
                 'person', 'pron_polite'),
             ('word', 'lemma', 'category', 'quan_type', 'gender', 'number'),
             ('word', 'lemma', 'category', 'verb_base', 'verb_conj',
-                'verb_mood','verb_refl', 'verb_tense', 'verb_trans',
+                'verb_mood','verb_prnl', 'verb_tense', 'verb_trans',
                 'verb_type', 'verb_class', 'number', 'person')
         )
         verbose_name = _("Lexical Entry")

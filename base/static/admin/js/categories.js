@@ -4,8 +4,8 @@
                   'adj_interp', 'art_type', 'conj_type', 'noun_degree',
                   'noun_interp', 'noun_type', 'prep_form', 'pron_polite',
                   'pron_case', 'quan_type', 'verb_base', 'verb_conj',
-                  'verb_mood', 'verb_refl', 'verb_tense', 'verb_class',
-                  'verb_trans', 'verb_type'];
+                  'verb_mood', 'verb_prnl', 'verb_tense', 'verb_class',
+                  'verb_trans', 'verb_type', 'interj'];
     var categories = {
         "adj": ['adj_degree', 'adj_interp', 'gender', 'number'],
         "adv": ['adv_meaning'],
@@ -25,7 +25,7 @@
         "relpron": ['gender', 'number'],
         "quan": ['quan_type', 'gender', 'number'],
         "verb": ['verb_base', 'verb_conj', 'verb_mood',
-                 'verb_refl', 'verb_tense', 'verb_trans',
+                 'verb_prnl', 'verb_tense', 'verb_trans',
                  'verb_type', 'verb_class', 'number', 'person']
      }
 

@@ -29,7 +29,7 @@ class Command(BaseCommand):
             raise CommandError("All the parameters must be provided.")
         spaces = re.compile(r"[ ]+")
         user = User.objects.all()[0]
-        atones_pronouns = ["me", "te", "se", "nos", "os"]
+        atones_pronouns = ["me", "te", "se", "nos", "os", "se"]
         defective = [u"abarse", u"abocanar", u"acaecer", u"acantelear",
                      u"acontecer", u"adir", u"alborecer", u"algarecear",
                      u"antojarse", u"atañer", u"atardecer", u"brisar",
@@ -56,7 +56,7 @@ class Command(BaseCommand):
                         lines.append(line)
                 non_personal, personal, imperative = self.split_mood(lines)
                 lemma = ""
-                reflexiveness = ""
+                pronominality = ""
                 klass = ""
                 vtype = LexicalEntry.VERB_TYPE_MAIN
                 for row in non_personal:
@@ -76,28 +76,63 @@ class Command(BaseCommand):
                         entry["verb_mood"] = LexicalEntry.VERB_MOOD_INFINITIVE
                         if verb.endswith(u"arse")  or verb.endswith(u"árse"):
                             entry["verb_class"] = LexicalEntry.VERB_CLASS_AR
-                            entry["verb_reflexiveness"] = LexicalEntry.VERB_REFL_REFLEXIVE
+                            entry["verb_prnl"] = LexicalEntry.VERB_PRNL_PRONOMINAL
                         elif verb.endswith(u"erse")  or verb.endswith(u"érse"):
                             entry["verb_class"] = LexicalEntry.VERB_CLASS_ER
-                            entry["verb_reflexiveness"] = LexicalEntry.VERB_REFL_REFLEXIVE
+                            entry["verb_prnl"] = LexicalEntry.VERB_PRNL_PRONOMINAL
                         elif verb.endswith(u"irse")  or verb.endswith(u"írse"):
                             entry["verb_class"] = LexicalEntry.VERB_CLASS_IR
-                            entry["verb_reflexiveness"] = LexicalEntry.VERB_REFL_REFLEXIVE
+                            entry["verb_prnl"] = LexicalEntry.VERB_PRNL_PRONOMINAL
                         elif verb.endswith(u"ar") or verb.endswith(u"ár"):
                             entry["verb_class"] = LexicalEntry.VERB_CLASS_AR
-                            entry["verb_reflexiveness"] = None  # LexicalEntry.VERB_REFL_NONREFLEXIVE
+                            entry["verb_prnl"] = None  # LexicalEntry.VERB_PRNL_NONPRONOMINAL
                         elif verb.endswith(u"er") or verb.endswith(u"ér"):
                             entry["verb_class"] = LexicalEntry.VERB_CLASS_ER
-                            entry["verb_reflexiveness"] = None  # LexicalEntry.VERB_REFL_NONREFLEXIVE
+                            entry["verb_prnl"] = None  # LexicalEntry.VERB_PRNL_NONPRONOMINAL
                         elif verb.endswith(u"ir") or verb.endswith(u"ír"):
                             entry["verb_class"] = LexicalEntry.VERB_CLASS_IR
-                            entry["verb_reflexiveness"] = None  # LexicalEntry.VERB_REFL_NONREFLEXIVE
+                            entry["verb_prnl"] = None  # LexicalEntry.VERB_PRNL_NONPRONOMINAL
                         if verb:
-                            reflexiveness = entry["verb_reflexiveness"]
+                            pronominality = entry["verb_prnl"]
                             klass = entry["verb_class"]
                             vtype = entry["verb_type"]
                             # entry.save()
-                            self.print_entry(entry, user)
+                            if pronominality != LexicalEntry.VERB_PRNL_PRONOMINAL:
+                                self.print_entry(entry, user)
+                            if verb[-2:] == u"se":
+                                verb = verb[:-2]
+                                entry["word"] = verb
+                                import ipdb; ipdb.set_trace()
+                                self.print_entry(entry, user)
+                            if verb.endswith(u"ár"):
+                                verb = verb.replace(u"ár", u"ar", -1)
+                            if verb.endswith(u"ér"):
+                                verb = verb.replace(u"ér", u"er", -1)
+                            if verb.endswith(u"ír"):
+                                verb = verb.replace(u"ír", u"ir", -1)
+                            person_count = 0
+                            for verb_suffix in atones_pronouns:
+                                number = LexicalEntry.NUMBER_SINGULAR
+                                if person_count > 2:
+                                    number = LexicalEntry.NUMBER_PLURAL
+                                if lemma in defective:
+                                    person = 3
+                                else:
+                                    person = str((person_count % 3) + 1)
+                                entry = {
+                                    "word": u"%s%s" % (verb, verb_suffix),
+                                    "lemma": lemma,
+                                    "category": LexicalEntry.CATEGORY_VERB,
+                                    "person": person,
+                                    "number": number,
+                                }
+                                entry["verb_mood"] = LexicalEntry.VERB_MOOD_GERUND
+                                entry["verb_prnl"] = pronominality
+                                entry["verb_class"] = klass
+                                entry["verb_type"] = vtype
+                                person_count += 1
+                                # entry.save()
+                                self.print_entry(entry, user)
                     elif u"participio" in row_type:
                         verbs = unicode(row[1].strip().decode("utf8"))
                         if u"," in verbs:
@@ -109,7 +144,7 @@ class Command(BaseCommand):
                                     "category": LexicalEntry.CATEGORY_VERB,
                                 }
                                 entry["verb_mood"] = LexicalEntry.VERB_MOOD_PARTICIPLE
-                                entry["verb_reflexiveness"] = reflexiveness
+                                entry["verb_prnl"] = pronominality
                                 entry["verb_class"] = klass
                                 entry["verb_type"] = vtype
                                 # entry.save()
@@ -121,7 +156,7 @@ class Command(BaseCommand):
                                 "category": LexicalEntry.CATEGORY_VERB,
                             }
                             entry["verb_mood"] = LexicalEntry.VERB_MOOD_PARTICIPLE
-                            entry["verb_reflexiveness"] = reflexiveness
+                            entry["verb_prnl"] = pronominality
                             entry["verb_class"] = klass
                             entry["verb_type"] = vtype
                             # entry.save()
@@ -137,7 +172,7 @@ class Command(BaseCommand):
                                     "category": LexicalEntry.CATEGORY_VERB,
                                 }
                                 entry["verb_mood"] = LexicalEntry.VERB_MOOD_GERUND
-                                entry["verb_reflexiveness"] = reflexiveness
+                                entry["verb_prnl"] = pronominality
                                 entry["verb_class"] = klass
                                 entry["verb_type"] = vtype
                                 # entry.save()
@@ -149,7 +184,7 @@ class Command(BaseCommand):
                                 "category": LexicalEntry.CATEGORY_VERB,
                             }
                             entry["verb_mood"] = LexicalEntry.VERB_MOOD_GERUND
-                            entry["verb_reflexiveness"] = reflexiveness
+                            entry["verb_prnl"] = pronominality
                             entry["verb_class"] = klass
                             entry["verb_type"] = vtype
                             # entry.save()
@@ -180,7 +215,7 @@ class Command(BaseCommand):
                                 person_count = 0
                             else:
                                 number = LexicalEntry.NUMBER_SINGULAR
-                                if person_count > 3:
+                                if person_count > 2:
                                     number = LexicalEntry.NUMBER_PLURAL
                                 if lemma in defective:
                                     person = 3
@@ -199,7 +234,7 @@ class Command(BaseCommand):
                                             "category": LexicalEntry.CATEGORY_VERB,
                                         }
                                         entry["verb_mood"] = mood
-                                        entry["verb_reflexiveness"] = reflexiveness
+                                        entry["verb_prnl"] = pronominality
                                         entry["verb_class"] = klass
                                         entry["number"] = number
                                         entry["person"] = person
@@ -230,7 +265,7 @@ class Command(BaseCommand):
                             "category": LexicalEntry.CATEGORY_VERB,
                         }
                         entry["verb_mood"] = LexicalEntry.VERB_MOOD_IMPERATIVE
-                        entry["verb_reflexiveness"] = reflexiveness
+                        entry["verb_prnl"] = pronominality
                         entry["verb_class"] = klass
                         entry["number"] = number
                         entry["person"] = LexicalEntry.PERSON_SECOND

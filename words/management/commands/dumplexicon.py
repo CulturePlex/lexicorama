@@ -35,10 +35,10 @@ class Command(BaseCommand):
                                   % file_name)
         if file_descr:
             for entry in LexicalEntry.objects.all():
-                file_descr.writeline(json.dumps(self.print_entry(entry)))
+                file_descr.write(u"%s\n" % json.dumps(self.print_entry(entry)))
         else:
             for entry in LexicalEntry.objects.all():
-                self.stdout.write(json.dumps(self.print_entry(entry)) + u"\n")
+                self.stdout.write(u"%s\n" % json.dumps(self.print_entry(entry)))
 
     def print_entry(self, entry):
         dic = {
