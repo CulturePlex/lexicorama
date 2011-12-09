@@ -97,13 +97,10 @@ class Command(BaseCommand):
                             klass = entry["verb_class"]
                             vtype = entry["verb_type"]
                             # entry.save()
-                            if pronominality != LexicalEntry.VERB_PRNL_PRONOMINAL:
-                                self.print_entry(entry, user)
                             if verb[-2:] == u"se":
                                 verb = verb[:-2]
                                 entry["word"] = verb
-                                import ipdb; ipdb.set_trace()
-                                self.print_entry(entry, user)
+                            self.print_entry(entry, user)
                             if verb.endswith(u"ár"):
                                 verb = verb.replace(u"ár", u"ar", -1)
                             if verb.endswith(u"ér"):
@@ -177,6 +174,19 @@ class Command(BaseCommand):
                                 entry["verb_type"] = vtype
                                 # entry.save()
                                 self.print_entry(entry, user)
+                            verb_stem = verb_stem.replace(u"ándo", u"ando", -1)
+                            verb_stem = verb_stem.replace(u"éndo", u"endo", -1)
+                            entry = {
+                                "word": verb_stem,
+                                "lemma": lemma,
+                                "category": LexicalEntry.CATEGORY_VERB,
+                            }
+                            entry["verb_mood"] = LexicalEntry.VERB_MOOD_GERUND
+                            entry["verb_prnl"] = pronominality
+                            entry["verb_class"] = klass
+                            entry["verb_type"] = vtype
+                            # entry.save()
+                            self.print_entry(entry, user)
                         elif verbs:
                             entry = {
                                 "word": verbs,
@@ -189,6 +199,20 @@ class Command(BaseCommand):
                             entry["verb_type"] = vtype
                             # entry.save()
                             self.print_entry(entry, user)
+                            verb = verbs.replace(u"ando", u"ándo", -1)
+                            verb = verb.replace(u"endo", u"éndo", -1)
+                            for verb_suffix in atones_pronouns:
+                                entry = {
+                                    "word": u"%s%s" % (verb, verb_suffix),
+                                    "lemma": lemma,
+                                    "category": LexicalEntry.CATEGORY_VERB,
+                                }
+                                entry["verb_mood"] = LexicalEntry.VERB_MOOD_GERUND
+                                entry["verb_prnl"] = pronominality
+                                entry["verb_class"] = klass
+                                entry["verb_type"] = vtype
+                                # entry.save()
+                                self.print_entry(entry, user)
                 for i, flexions in enumerate(personal):
                     mood = LexicalEntry.VERB_MOOD_INDICATIVE
                     if i == 2:
