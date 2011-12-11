@@ -21,7 +21,6 @@ class Command(BaseCommand):
             default=False,
             help='Dumps only the verbs.'),
         make_option('--increment',
-            action='store_true',
             type='long',
             dest='increment',
             default=10000,
