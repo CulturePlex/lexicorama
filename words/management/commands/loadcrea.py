@@ -34,10 +34,12 @@ class Command(BaseCommand):
                 freq = float(freq)
                 entries = LexicalEntry.objects.filter(word=word)
                 entries.update(frequency=freq)
-                if not entries:
-                    dic = {
-                        "word": word,
-                        "frequency": freq,
-                    }
-                    self.stdout.write(json.dumps(dic) + "\n")
-
+                #if not entries:
+                #    dic = {
+                #        "word": word,
+                #        "frequency": freq,
+                #    }
+                #    self.stdout.write(json.dumps(dic) + "\n")
+                if cont % 1000 == 0:
+                    self.stdout.write(u"...%s (%s)\n" % (cont, word))
+                cont += 1

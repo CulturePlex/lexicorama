@@ -56,11 +56,14 @@ class Command(BaseCommand):
                     entry.frequency = line.get("frequency", 0.0)
                     entry.category = category
                     for k, v in line["msd"].items():
-                        if v and hasattr(entry, k) and v.strip():
-                            try:
-                                setattr(entry, k, v.strip())
-                            except e:
-                                print e, entry, line
+                        try:
+                            if v and hasattr(entry, k) and v.strip():
+                                try:
+                                    setattr(entry, k, v.strip())
+                                except e:
+                                    print e, entry, line
+                        except Exception:
+                            raise Exception("%s" % line)
                     cont += 1
                     if cont % 1000 == 0:
                         self.stdout.write(u"... %s (%s)\n" \

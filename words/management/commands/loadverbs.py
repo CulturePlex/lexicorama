@@ -112,10 +112,10 @@ class Command(BaseCommand):
                                 number = LexicalEntry.NUMBER_SINGULAR
                                 if person_count > 2:
                                     number = LexicalEntry.NUMBER_PLURAL
-                                if lemma in defective:
-                                    person = 3
-                                else:
-                                    person = str((person_count % 3) + 1)
+                                # if lemma in defective:
+                                #    person = "3"
+                                # else:
+                                person = str((person_count % 3) + 1)
                                 entry = {
                                     "word": u"%s%s" % (verb, verb_suffix),
                                     "lemma": lemma,
@@ -242,7 +242,7 @@ class Command(BaseCommand):
                                 if person_count > 2:
                                     number = LexicalEntry.NUMBER_PLURAL
                                 if lemma in defective:
-                                    person = 3
+                                    person = "3"
                                 else:
                                     person = str((person_count % 3) + 1)
                                 for verb in words.replace(" o ", " / ").replace(" u ", " / ").split("/"):

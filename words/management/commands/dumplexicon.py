@@ -34,8 +34,12 @@ class Command(BaseCommand):
                 self.stdout.write("Unable to create a file: \"%s\"\n" \
                                   % file_name)
         if file_descr:
+            cont = 0
             for entry in LexicalEntry.objects.all():
                 file_descr.write(u"%s\n" % json.dumps(self.print_entry(entry)))
+                if cont % 1000 == 0:
+                    self.stdout.write(u"...%s (%s)\n" % (cont, entry.word))
+                cont += 1
         else:
             for entry in LexicalEntry.objects.all():
                 self.stdout.write(u"%s\n" % json.dumps(self.print_entry(entry)))
