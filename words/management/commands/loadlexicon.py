@@ -50,12 +50,15 @@ class Command(BaseCommand):
                     or (options["no_verbs"] and category != "verb")):
                     entry = LexicalEntry()
                     entry.user = user
-                    entry.word = line["flexion"]
+                    entry.word = line.get("flexion", line.get("word"))
                     entry.lemma = line["lemma"]
                     entry.eagle = line.get("eagle_code", line.get("eagle", None))
                     entry.frequency = line.get("frequency", 0.0)
                     entry.category = category
-                    for k, v in line["msd"].items():
+                    features_key = "features"
+                    if features_key not in line:
+                        features_key = "msd"
+                    for k, v in line[features_key].items():
                         try:
                             if v and hasattr(entry, k) and v.strip():
                                 try:
@@ -73,4 +76,5 @@ class Command(BaseCommand):
                     except IntegrityError, e:
                         self.stdout.write(u"-- ERROR: %s.\n\t%s\n" \
                                           % (line, e))
+            file_descr.close()
 

@@ -43,3 +43,4 @@ class Command(BaseCommand):
                 if cont % 1000 == 0:
                     self.stdout.write(u"...%s (%s)\n" % (cont, word))
                 cont += 1
+            file_descr.close()

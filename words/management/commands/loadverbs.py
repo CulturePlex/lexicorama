@@ -54,6 +54,7 @@ class Command(BaseCommand):
                     if file_line.startswith("|"):
                         line = " ".join(spaces.split(file_line.replace("_", " ").strip())).split("|")[1:-1]
                         lines.append(line)
+                file_descr.close()
                 non_personal, personal, imperative = self.split_mood(lines)
                 lemma = ""
                 pronominality = ""
