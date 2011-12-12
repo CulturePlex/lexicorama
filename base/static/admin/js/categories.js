@@ -5,7 +5,7 @@
                   'noun_interp', 'noun_type', 'prep_form', 'pron_polite',
                   'pron_case', 'quan_type', 'verb_base', 'verb_conj',
                   'verb_mood', 'verb_prnl', 'verb_tense', 'verb_class',
-                  'verb_trans', 'verb_type', 'interj'];
+                  'verb_trans', 'verb_type'];
     var categories = {
         "adj": ['adj_degree', 'adj_interp', 'gender', 'number'],
         "adv": ['adv_meaning'],
@@ -15,6 +15,7 @@
         "excl": ['gender', 'number'],
         "indefpron": ['gender', 'number'],
         "int": ['gender', 'number'],
+        "interj": [],
         "conj": ['conj_type'],
         "noun": ['noun_degree', 'noun_interp', 'noun_type',
                  'gender', 'number'],
@@ -45,6 +46,6 @@
     }
 
     $(document).ready(init);
-})(django.jQuery);
+})((typeof django !== "undefined" && django.jQuery) || (typeof django === "undefined" && jQuery));
 
 

@@ -354,7 +354,7 @@ class LexicalEntry(models.Model):
     )
     verb_type = models.CharField(_("Type"), max_length=10,
                                  choices=VERB_TYPE_CHOICES, blank=True,
-                                 null=True, default=VERB_TYPE_MAIN)
+                                 null=True)
     VERB_CLASS_AR = "ar"
     VERB_CLASS_ER = "er"
     VERB_CLASS_IR = "ir"

@@ -1,40 +1,68 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n humanize %}
+
+{% block extra_scripts %}
+{{ block.super }}
+{{ entry_form.media }}
+{% endblock %}
 
 {% block startbody %}
 <form action="{% url search %}" method="get" id="search">
 {% endblock %}
 
 {% block sidebar %}
-<h3>{% trans "Filters" %}</h3>
-<h5>Sidebar</h5>
-<ul>
-<li><a href="#">Link</a></li>
-<li><a href="#">Link</a></li>
-<li><a href="#">Link</a></li>
-<li><a href="#">Link</a></li>
-</ul>
-<h5>Sidebar</h5>
-<ul>
-<li><a href="#">Link</a></li>
-<li><a href="#">Link</a></li>
-<li><a href="#">Link</a></li>
-<li><a href="#">Link</a></li>
-<li><a href="#">Link</a></li>
-<li><a href="#">Link</a></li>
-</ul>
-<h5>Sidebar</h5>
-<ul>
-<li><a href="#">Link</a></li>
-<li><a href="#">Link</a></li>
-</ul>
+<!--<h3>{% trans "Facets" %}</h3>-->
+{% for field in entry_form.visible_fields %}
+    <div class="{{ field.html_name }}{% if field.name != "category" %} facet-block{% endif %}">
+        {# Include the hidden fields in the form #}
+        {% if forloop.first %}
+            {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+            {% endfor %}
+        {% endif %}
+        <h3>{{ field.label }}</h3>
+        {{ field.errors }}
+        {{ field }}
+    </div>
+{% endfor %}
+<div class="center">
+<input type="submit" value="{% trans "Apply Facets" %}" class="primary">
+<input type="button" value="{% trans "Reset Facets" %}" class="reset-facets">
+</div>
 {% endblock %}
 
 {% block herounit %}
 <h3>{% trans "Lexical Entry" %}</h3>
+<span class="search-options">
+{% for field in search_options_form %}
+        <h3 class="inline">{{ field.label }}</h3>
+        {{ field.errors }}
+        {{ field }}
+{% endfor %}
+</span>
+<span class="main-search">
 {{ search_form.as_p }}
+</span>
 {% if not q %}
 <p>Vestibulum id ligula porta felis euismod semper. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+{% else %}
+    {% if entries.paginator.count > 0 %}
+    <span class="total-results">
+        {{ entries.paginator.count|intcomma }} 
+        {% if entries.paginator.count < 2 %}
+            {% trans "result in" %}
+        {% else %}
+            {% trans "results in" %}
+        {% endif %}
+        {{ query_time }} {% trans "seconds" %}.
+    </span>
+    {% else %}
+    <span class="total-results">
+    {% blocktrans %}
+        No results. Try to <a href="javascript:void(0);" class="reset-facets">resetting the facets</a> or changing the category.
+    {% endblocktrans %}
+    </span>
+    {% endif %}
 {% endif %}
 <!--<p><input type="text"/><a class="btn primary large">Learn more &raquo;</a></p>-->
 {% endblock %}
@@ -42,18 +70,46 @@
 
 {% block content %}
 {% if entries %}
-<dl>
-{% for entry in entries %}
+<ol start="{{ start_list }}">
+{% for entry in entries.object_list %}
     {% autoescape off %}
+    <li>
     <dt>
-        <span class="logofont">{{ entry.word }}</span>. {{ entry.get_category_display }} ({{ entry.lemma }})
+        <span class="label">{{ entry.get_category_display }}</span> <span class="logofont">{{ entry.word }}</span>. ({{ entry.lemma }})
     </dt>
     <dd>
         {{ entry.get_features_display }}
     </dd>
+    </li>
     {% endautoescape %}
 {% endfor %}
-</dl>
+</ol>
+{% endif %}
+
+{% if entries.paginator.count > 0 %}
+<div class="center">
+<div class="pagination">
+  <ul>
+    <li class="prev{% if not entries.has_previous %} disabled{% endif %}">
+        {% if entries.has_previous %}
+        <a href="?{{ url_path }}&page={{ entries.previous_page_number }}">&larr; {% trans "Previous" %}</a>
+        {% else %}
+        <a href="javascript:void(0);">&larr; {% trans "Previous" %}</a>
+        {% endif %}
+    </li>
+    <li class="active">
+        <a href="#">Page {{ entries.number }} of {{ entries.paginator.num_pages }}.</a>
+    </li>
+    <li class="next{% if not entries.has_next %} disabled{% endif %}">
+        {% if entries.has_next %}
+        <a href="?{{ url_path }}&page={{ entries.next_page_number }}">{% trans "Next" %} &rarr;</a>
+        {% else %}
+        <a href="javascript:void(0);">{% trans "Next" %} &rarr;</a>
+        {% endif %}
+    </li>
+  </ul>
+</div>
+</div>
 {% endif %}
 {% endblock %}
 

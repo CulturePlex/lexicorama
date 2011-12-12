@@ -14,8 +14,12 @@ body {
     font-size: 1em;
 }
 
-h1,h2,h3,h4,h5,h6,h7,.topbar {
+h1,h2,h3,h4,h5,h5,h6,h7,.topbar {
     font-family: 'IM Fell DW Pica SC', serif;
+}
+
+.inline {
+    display: inline-block;
 }
 
 .logofont {
@@ -46,15 +50,60 @@ input[type="text"] {
     padding: 25px;
 }
 
-.hero-unit label {
+.hero-unit .main-search label {
     display: none;
 }
 
-dl dt {
+.hero-unit .search-options {
+    float: right;
+    position: absolute;
+    padding: 4px 30px 4px 4px;
+    right: 0px;
+    margin-right: 10px;
+}
+
+.hero-unit .search-options h3 {
+    margin-left: 10px;
+}
+
+dt {
     font-weight: normal;
 }
 
-dl dd {
-    line-height: 50px;
-    padding-left: 30px;
+dd {
+    line-height: 20px;
+    padding: 5px 5px 20px 30px;
 }
+
+select {
+    width: 180px;
+    margin-bottom: 15px;
+}
+
+ul {
+    list-style: none;
+    text-align: left;
+    margin: 0 0 5px 10px;
+}
+
+ol {
+    margin-left: 75px;
+}
+
+label {
+    text-align: left;
+    float: none;
+}
+
+.center {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.total-results {
+    font-size: 0.8em;
+}
+
+.pagination a:hover, .pagination .active a {
+    background-color: rgba(0, 0, 0, 0.05);
+
