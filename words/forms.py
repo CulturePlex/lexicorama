@@ -18,8 +18,10 @@ class SearchOptionsForm(forms.Form):
     in_lemma = forms.BooleanField(label=_("In Lemma"), required=False)
     MATCH_CHOICES = (
         ("iexact", _("Exactly the Word")),
-        ("regexp", _("A Regular Expression")),
-        ("icontains", _("Contained Word")),
+        ("istartswith", _("The Beginning of the Word")),
+        ("iendswith", _("The End of the Word")),
+        ("iregex", _("As a Regular Expression")),
+        ("icontains", _("Inside the Word")),
     )
     match = forms.ChoiceField(label=_("Matching"), required=False,
                               choices=MATCH_CHOICES)

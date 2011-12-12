@@ -2,7 +2,7 @@
 from urllib import urlencode
 
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from django.db import connection
+from django.db import connection, DatabaseError
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 
@@ -18,6 +18,7 @@ def search(request):
     entries = []
     query_time = 0.0
     start_list = 1
+    regexp_error = False
     if data:
         entry_form = LexicalEntryForm(data=data)
         if (search_form.is_valid() and search_options_form.is_valid()
@@ -45,6 +46,11 @@ def search(request):
                     entries = paginator.page(page)
                 except (EmptyPage, InvalidPage):
                     entries = paginator.page(paginator.num_pages)
+                except DatabaseError:
+                    entry_list = LexicalEntry.objects.none()
+                    paginator = Paginator(entry_list, 15)
+                    entries = paginator.page(1)
+                    regexp_error = True
                 if connection.queries:
                     query_time = connection.queries[-1]["time"]
                 start_list = ((entries.number - 1) * entries.paginator.per_page) + 1
@@ -58,5 +64,6 @@ def search(request):
                                "query_time": query_time,
                                "start_list": start_list,
                                "url_path": url_path,
+                               "regexp_error": regexp_error,
                                "q": q},
                               context_instance=RequestContext(request))

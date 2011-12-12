@@ -39,6 +39,7 @@
         {{ field.errors }}
         {{ field }}
 {% endfor %}
+<input type="submit" title="{% trans "Search" %}" id="search-submit" value="">
 </span>
 <span class="main-search">
 {{ search_form.as_p }}
@@ -46,20 +47,28 @@
 {% if not q %}
 <p>Vestibulum id ligula porta felis euismod semper. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
 {% else %}
-    {% if entries.paginator.count > 0 %}
-    <span class="total-results">
-        {{ entries.paginator.count|intcomma }} 
-        {% if entries.paginator.count < 2 %}
-            {% trans "result in" %}
+    {% if not regexp_error %}
+        {% if entries.paginator.count > 0 %}
+        <span class="total-results">
+            {{ entries.paginator.count|intcomma }} 
+            {% if entries.paginator.count < 2 %}
+                {% trans "result in" %}
+            {% else %}
+                {% trans "results in" %}
+            {% endif %}
+            {{ query_time }} {% trans "seconds" %}.
+        </span>
         {% else %}
-            {% trans "results in" %}
+        <span class="total-results">
+        {% blocktrans %}
+            No results. Try to <a href="javascript:void(0);" class="reset-facets">resetting the facets</a> or changing the category.
+        {% endblocktrans %}
+        </span>
         {% endif %}
-        {{ query_time }} {% trans "seconds" %}.
-    </span>
     {% else %}
     <span class="total-results">
     {% blocktrans %}
-        No results. Try to <a href="javascript:void(0);" class="reset-facets">resetting the facets</a> or changing the category.
+        No results. The regular expression provided may not be correct. Take a look on the <a href="http://docs.python.org/library/re.html">official documentation</a>.
     {% endblocktrans %}
     </span>
     {% endif %}

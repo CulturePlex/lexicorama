@@ -46,6 +46,16 @@ input[type="text"] {
     width: 100%;
 }
 
+input#search-submit {
+    cursor: pointer;
+    border: 0;
+    background: white url('../img/magnifying-glass.png');
+    width: 24px;
+    height: 24px;
+    margin: 3px;
+    box-shadow: none;
+}
+
 .hero-unit {
     padding: 25px;
 }
