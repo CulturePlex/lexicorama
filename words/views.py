@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import types
 from urllib import urlencode
 
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
@@ -55,6 +56,10 @@ def search(request):
                     query_time = connection.queries[-1]["time"]
                 start_list = ((entries.number - 1) * entries.paginator.per_page) + 1
     data.pop("page", None)
+    # HACK: Avoid crash on unicode characters in urlencode
+    # Taken from: http://evanculver.com/2009/10/12/url-encoding-weird-unicode-characters-in-pythondjango/
+    data = dict([(k, v.encode('utf-8') if type(v) is types.UnicodeType else v)
+                 for (k,v) in data.items()])
     url_path = urlencode(data)
     return render_to_response('search.html',
                               {"search_form": search_form,
