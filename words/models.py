@@ -26,15 +26,15 @@ class LexicalEntry(models.Model):
         "conj": ['conj_type'],
         "noun": ['noun_degree', 'noun_interp', 'noun_type',
                  'gender', 'number'],
-        "possadj": ['gender', 'number', 'person'],
-        "posspron": ['gender', 'number', 'person'],
+        "possadj": ['gender', 'number', 'person', 'polite'],
+        "posspron": ['gender', 'number', 'person', 'polite'],
         "prep": ['prep_form'],
-        "pron": ['pron_case', 'gender', 'number', 'person', 'pron_polite'],
+        "pron": ['pron_case', 'gender', 'number', 'person', 'polite'],
         "relpron": ['gender', 'number'],
         "quan": ['quan_type', 'gender', 'number'],
         "verb": ['verb_base', 'verb_conj', 'verb_mood',
                  'verb_prnl', 'verb_tense', 'verb_trans',
-                 'verb_type', 'verb_class', 'number', 'person'],
+                 'verb_type', 'verb_class', 'number', 'person', 'polite'],
     }
     CATEGORY_ADJECTIVE = "adj"
     CATEGORY_ADVERB = "adv"
@@ -107,6 +107,15 @@ class LexicalEntry(models.Model):
     )
     person = models.CharField(_("Person"), max_length=10,
                               choices=PERSON_CHOICES, blank=True, null=True)
+    POLITE_REGULAR = "reg"
+    POLITE_POLITE = "pol"
+    POLITE_CHOICES = (
+        (POLITE_REGULAR , _("Regular")),
+        (POLITE_POLITE, _("Polite")),
+    )
+    polite = models.CharField(_("Politeness"), max_length=10,
+                              choices=POLITE_CHOICES, blank=True,
+                              null=True)
     # Adjectives
     # is_adjective = models.BooleanField(_("Adjective"), default=False)
     ADJ_DEGREE_COMPARATIVE = "comp"
@@ -248,15 +257,6 @@ class LexicalEntry(models.Model):
     pron_case = models.CharField(_("Case"), max_length=10,
                                  choices=PRON_CASE_CHOICES, blank=True,
                                  null=True)
-    PRON_POLITE_REGULAR = "reg"
-    PRON_POLITE_POLITE = "pol"
-    PRON_POLITE_CHOICES = (
-        (PRON_POLITE_REGULAR , _("Nominative")),
-        (PRON_POLITE_POLITE, _("Accusative")),
-    )
-    pron_polite = models.CharField(_("Politeness"), max_length=10,
-                                    choices=PRON_POLITE_CHOICES, blank=True,
-                                    null=True)
     # Quantifiers
     # is_quantifier = models.BooleanField(_("Quantifier"), default=False)
     QUAN_TYPE_CARDINAL = "card"
@@ -367,6 +367,8 @@ class LexicalEntry(models.Model):
                                   choices=VERB_CLASS_CHOICES, blank=True,
                                   null=True)
 
+    notes = models.TextField(_("Notes"), null=True, blank=True)
+
     class Meta:
         ordering = ["lemma", "word", "frequency", "date"]
         unique_together = (
@@ -381,7 +383,7 @@ class LexicalEntry(models.Model):
             # ('word', 'lemma', 'category', 'gender', 'number', 'person'),
             ('word', 'lemma', 'category', 'prep_form'),
             ('word', 'lemma', 'category', 'pron_case', 'gender', 'number',
-                'person', 'pron_polite'),
+                'person', 'polite'),
             ('word', 'lemma', 'category', 'quan_type', 'gender', 'number'),
             ('word', 'lemma', 'category', 'verb_base', 'verb_conj',
                 'verb_mood','verb_prnl', 'verb_tense', 'verb_trans',

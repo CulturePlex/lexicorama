@@ -3,7 +3,6 @@ import json
 import re
 
 from django.db import transaction
-from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 
 from words.models import LexicalEntry
@@ -28,7 +27,6 @@ class Command(BaseCommand):
         except IndexError:
             raise CommandError("All the parameters must be provided.")
         spaces = re.compile(r"[ ]+")
-        user = User.objects.all()[0]
         atones_pronouns = ["me", "te", "se", "nos", "os", "se"]
         defective = [u"abarse", u"abocanar", u"acaecer", u"acantelear",
                      u"acontecer", u"adir", u"alborecer", u"algarecear",
@@ -60,6 +58,7 @@ class Command(BaseCommand):
                 pronominality = ""
                 klass = ""
                 vtype = LexicalEntry.VERB_TYPE_MAIN
+                notes = u"%s" % i
                 for row in non_personal:
                     row_type = row[0].strip().lower()
                     if u"infinitivo" in row_type:
@@ -101,7 +100,7 @@ class Command(BaseCommand):
                             if verb[-2:] == u"se":
                                 verb = verb[:-2]
                                 entry["word"] = verb
-                            self.print_entry(entry, user)
+                            self.print_entry(entry, notes)
                             if verb.endswith(u"ár"):
                                 verb = verb.replace(u"ár", u"ar", -1)
                             if verb.endswith(u"ér"):
@@ -114,7 +113,7 @@ class Command(BaseCommand):
                                 if person_count > 2:
                                     number = LexicalEntry.NUMBER_PLURAL
                                 # if lemma in defective:
-                                #    person = "3"
+                                #    person = LexicalEntry.PERSON_THIRD
                                 # else:
                                 person = str((person_count % 3) + 1)
                                 entry = {
@@ -124,13 +123,18 @@ class Command(BaseCommand):
                                     "person": person,
                                     "number": number,
                                 }
-                                entry["verb_mood"] = LexicalEntry.VERB_MOOD_GERUND
+                                entry["verb_mood"] = LexicalEntry.VERB_MOOD_INFINITIVE
                                 entry["verb_prnl"] = pronominality
                                 entry["verb_class"] = klass
                                 entry["verb_type"] = vtype
                                 person_count += 1
                                 # entry.save()
-                                self.print_entry(entry, user)
+                                self.print_entry(entry.copy(), notes)
+                                # Third person for "usted"
+                                if (person == LexicalEntry.PERSON_THIRD):
+                                    entry["person"] = LexicalEntry.PERSON_SECOND
+                                    entry["polite"] = LexicalEntry.POLITE_POLITE
+                                    self.print_entry(entry, notes)
                     elif u"participio" in row_type:
                         verbs = unicode(row[1].strip().decode("utf8"))
                         if u"," in verbs:
@@ -146,7 +150,7 @@ class Command(BaseCommand):
                                 entry["verb_class"] = klass
                                 entry["verb_type"] = vtype
                                 # entry.save()
-                                self.print_entry(entry, user)
+                                self.print_entry(entry, notes)
                         elif verbs:
                             entry = {
                                 "word": verbs,
@@ -158,23 +162,38 @@ class Command(BaseCommand):
                             entry["verb_class"] = klass
                             entry["verb_type"] = vtype
                             # entry.save()
-                            self.print_entry(entry, user)
+                            self.print_entry(entry, notes)
                     elif u"gerundio" in row_type:
                         verbs = unicode(row[1].strip().decode("utf8"))
                         if "etc." in verbs:
                             verb_stem = verbs.replace("etc.", "").split(",")[0].strip()[:-2]
+                            person_count = 0
                             for verb_suffix in atones_pronouns:
+                                number = LexicalEntry.NUMBER_SINGULAR
+                                if person_count > 2:
+                                    number = LexicalEntry.NUMBER_PLURAL
+                                # if lemma in defective:
+                                #    person = LexicalEntry.PERSON_THIRD
+                                # else:
+                                person = str((person_count % 3) + 1)
                                 entry = {
                                     "word": u"%s%s" % (verb_stem, verb_suffix),
                                     "lemma": lemma,
                                     "category": LexicalEntry.CATEGORY_VERB,
+                                    "number": number,
+                                    "person": person,
                                 }
                                 entry["verb_mood"] = LexicalEntry.VERB_MOOD_GERUND
                                 entry["verb_prnl"] = pronominality
                                 entry["verb_class"] = klass
                                 entry["verb_type"] = vtype
+                                person_count += 1
                                 # entry.save()
-                                self.print_entry(entry, user)
+                                self.print_entry(entry.copy(), notes)
+                                # Third person for "usted"
+                                if (person == LexicalEntry.PERSON_THIRD):
+                                    entry["person"] = LexicalEntry.PERSON_SECOND
+                                    entry["polite"] = LexicalEntry.POLITE_POLITE
                             verb_stem = verb_stem.replace(u"ándo", u"ando", -1)
                             verb_stem = verb_stem.replace(u"éndo", u"endo", -1)
                             entry = {
@@ -187,7 +206,7 @@ class Command(BaseCommand):
                             entry["verb_class"] = klass
                             entry["verb_type"] = vtype
                             # entry.save()
-                            self.print_entry(entry, user)
+                            self.print_entry(entry, notes)
                         elif verbs:
                             entry = {
                                 "word": verbs,
@@ -199,21 +218,36 @@ class Command(BaseCommand):
                             entry["verb_class"] = klass
                             entry["verb_type"] = vtype
                             # entry.save()
-                            self.print_entry(entry, user)
+                            self.print_entry(entry, notes)
                             verb = verbs.replace(u"ando", u"ándo", -1)
                             verb = verb.replace(u"endo", u"éndo", -1)
+                            person_count = 0
                             for verb_suffix in atones_pronouns:
+                                number = LexicalEntry.NUMBER_SINGULAR
+                                if person_count > 2:
+                                    number = LexicalEntry.NUMBER_PLURAL
+                                # if lemma in defective:
+                                #    person = LexicalEntry.PERSON_THIRD
+                                # else:
+                                person = str((person_count % 3) + 1)
                                 entry = {
                                     "word": u"%s%s" % (verb, verb_suffix),
                                     "lemma": lemma,
                                     "category": LexicalEntry.CATEGORY_VERB,
+                                    "number": number,
+                                    "person": person,
                                 }
                                 entry["verb_mood"] = LexicalEntry.VERB_MOOD_GERUND
                                 entry["verb_prnl"] = pronominality
                                 entry["verb_class"] = klass
                                 entry["verb_type"] = vtype
+                                person_count += 1
                                 # entry.save()
-                                self.print_entry(entry, user)
+                                self.print_entry(entry.copy(), notes)
+                                # Third person for "usted"
+                                if (person == LexicalEntry.PERSON_THIRD):
+                                    entry["person"] = LexicalEntry.PERSON_SECOND
+                                    entry["polite"] = LexicalEntry.POLITE_POLITE
                 for i, flexions in enumerate(personal):
                     mood = LexicalEntry.VERB_MOOD_INDICATIVE
                     if i == 2:
@@ -243,60 +277,95 @@ class Command(BaseCommand):
                                 if person_count > 2:
                                     number = LexicalEntry.NUMBER_PLURAL
                                 if lemma in defective:
-                                    person = "3"
+                                    person = LexicalEntry.PERSON_THIRD
                                 else:
                                     person = str((person_count % 3) + 1)
-                                for verb in words.replace(" o ", " / ").replace(" u ", " / ").split("/"):
-                                    verb = verb.strip()
-                                    if u" " in verb:
-                                        for pron in atones_pronouns:
-                                            if u"%s " % pron in verb:
-                                                verb = verb.replace(pron, "", 1).strip()
-                                    if verb and verb not in atones_pronouns:
-                                        entry = {
-                                            "word": verb,
-                                            "lemma": lemma,
-                                            "category": LexicalEntry.CATEGORY_VERB,
-                                        }
-                                        entry["verb_mood"] = mood
-                                        entry["verb_prnl"] = pronominality
-                                        entry["verb_class"] = klass
-                                        entry["number"] = number
-                                        entry["person"] = person
-                                        entry["verb_tense"] = tense
-                                        entry["verb_type"] = vtype
-                                        # entry.save()
-                                        self.print_entry(entry, user)
+                                for iverb, verbs in enumerate(words.split("/")):
+                                    polite = LexicalEntry.POLITE_REGULAR
+                                    if iverb == 1:
+                                        polite = LexicalEntry.POLITE_POLITE
+                                        if (tense == LexicalEntry.VERB_TENSE_PRESENT
+                                            and mood == LexicalEntry.VERB_MOOD_INDICATIVE
+                                            and person == LexicalEntry.PERSON_SECOND):
+                                            # We ignore the "voseo"
+                                            continue
+                                    for verb in verbs.replace(" o ", " / ").replace(" u ", " / ").split("/"):
+                                        verb = verb.strip()
+                                        if u" " in verb:
+                                            for pron in atones_pronouns:
+                                                if u"%s " % pron in verb:
+                                                    verb = verb.replace(pron, "", 1).strip()
+                                        if verb and verb not in atones_pronouns:
+                                            entry = {
+                                                "word": verb,
+                                                "lemma": lemma,
+                                                "category": LexicalEntry.CATEGORY_VERB,
+                                                "polite": polite,
+                                            }
+                                            entry["verb_mood"] = mood
+                                            entry["verb_prnl"] = pronominality
+                                            entry["verb_class"] = klass
+                                            entry["number"] = number
+                                            entry["person"] = person
+                                            entry["verb_tense"] = tense
+                                            entry["verb_type"] = vtype
+                                            # entry.save()
+                                            self.print_entry(entry.copy(), notes)
+                                            # Third person for "usted"
+                                            if (person == LexicalEntry.PERSON_THIRD
+                                                and number == LexicalEntry.NUMBER_SINGULAR):
+                                                entry["person"] = LexicalEntry.PERSON_SECOND
+                                                entry["polite"] = LexicalEntry.POLITE_POLITE
+                                                self.print_entry(entry, notes)
+                                                # Imperative for "usted"
+                                                if (tense == LexicalEntry.VERB_TENSE_PRESENT
+                                                    and mood == LexicalEntry.VERB_MOOD_SUBJUNCTIVE):
+                                                    entry = {
+                                                        "word": verb,
+                                                        "lemma": lemma,
+                                                        "category": LexicalEntry.CATEGORY_VERB,
+                                                        "polite": LexicalEntry.POLITE_POLITE,
+                                                    }
+                                                    entry["verb_mood"] = LexicalEntry.VERB_MOOD_IMPERATIVE
+                                                    entry["verb_prnl"] = pronominality
+                                                    entry["verb_class"] = klass
+                                                    entry["number"] = number
+                                                    entry["person"] = LexicalEntry.PERSON_SECOND
+                                                    entry["verb_type"] = vtype
+                                                    self.print_entry(entry, notes)
                                 person_count += 1
-                for flexions in imperative:
+                for i, flexions in enumerate(imperative):
                     flexions = flexions.replace("(tú / vos)", "")
                     flexions = flexions.replace("(tú)", "")
-                    flexions = flexions.replace("(vos)", "")
+                    # We ignore the "voseo"
+                    # flexions = flexions.replace("(vos)", "")
                     flexions = flexions.replace("(vosotros / ustedes)", "")
                     flexions = flexions.replace("(vosotros)", "")
                     flexions = flexions.replace("(ustedes)", "")
                     flexions = flexions.replace(" o ", " / ")
                     flexions = flexions.replace(" u ", " / ")
-                    for i, verb in enumerate(flexions.split("/")):
-                        verb = unicode(verb.strip().decode("utf8")).lower()
-                        if i == 0:
-                            number = LexicalEntry.NUMBER_SINGULAR
-                        else:
-                            number = LexicalEntry.NUMBER_PLURAL
-                        verb = verb.strip()
-                        entry = {
-                            "word": verb,
-                            "lemma": lemma,
-                            "category": LexicalEntry.CATEGORY_VERB,
-                        }
-                        entry["verb_mood"] = LexicalEntry.VERB_MOOD_IMPERATIVE
-                        entry["verb_prnl"] = pronominality
-                        entry["verb_class"] = klass
-                        entry["number"] = number
-                        entry["person"] = LexicalEntry.PERSON_SECOND
-                        entry["verb_type"] = vtype
-                        # entry.save()
-                        self.print_entry(entry, user)
+                    for verb in flexions.split("/"):
+                        # We ignore the "voseo"
+                        if "(vos)" not in verb:
+                            verb = unicode(verb.strip().decode("utf8")).lower()
+                            if i == 0:
+                                number = LexicalEntry.NUMBER_SINGULAR
+                            else:
+                                number = LexicalEntry.NUMBER_PLURAL
+                            verb = verb.strip()
+                            entry = {
+                                "word": verb,
+                                "lemma": lemma,
+                                "category": LexicalEntry.CATEGORY_VERB,
+                            }
+                            entry["verb_mood"] = LexicalEntry.VERB_MOOD_IMPERATIVE
+                            entry["verb_prnl"] = pronominality
+                            entry["verb_class"] = klass
+                            entry["number"] = number
+                            entry["person"] = LexicalEntry.PERSON_SECOND
+                            entry["verb_type"] = vtype
+                            # entry.save()
+                            self.print_entry(entry, notes)
 
     def split_mood(self, lines):
         lines_len = len(lines)
@@ -328,11 +397,12 @@ class Command(BaseCommand):
         personal = zip(*personal_lines)
         return non_personal, personal, imperative
 
-    def print_entry(self, entry, user):
+    def print_entry(self, entry, notes):
         dic = {
             "category": entry.pop("category"),
             "lemma": entry.pop("lemma"),
             "flexion": entry.pop("word"),
+            "notes": notes,
             "msd": entry,
         }
         self.stdout.write(json.dumps(dic) + u"\n")

@@ -2,7 +2,7 @@
 
     var fields = ['gender', 'number', 'person', 'adj_degree', 'adv_meaning',
                   'adj_interp', 'art_type', 'conj_type', 'noun_degree',
-                  'noun_interp', 'noun_type', 'prep_form', 'pron_polite',
+                  'noun_interp', 'noun_type', 'prep_form', 'polite',
                   'pron_case', 'quan_type', 'verb_base', 'verb_conj',
                   'verb_mood', 'verb_prnl', 'verb_tense', 'verb_class',
                   'verb_trans', 'verb_type'];
@@ -19,15 +19,15 @@
         "conj": ['conj_type'],
         "noun": ['noun_degree', 'noun_interp', 'noun_type',
                  'gender', 'number'],
-        "possadj": ['gender', 'number', 'person'],
-        "posspron": ['gender', 'number', 'person'],
+        "possadj": ['gender', 'number', 'person', 'polite'],
+        "posspron": ['gender', 'number', 'person', 'polite'],
         "prep": ['prep_form'],
-        "pron": ['pron_case', 'gender', 'number', 'person', 'pron_polite'],
+        "pron": ['pron_case', 'gender', 'number', 'person', 'polite'],
         "relpron": ['gender', 'number'],
         "quan": ['quan_type', 'gender', 'number'],
         "verb": ['verb_base', 'verb_conj', 'verb_mood',
                  'verb_prnl', 'verb_tense', 'verb_trans',
-                 'verb_type', 'verb_class', 'number', 'person']
+                 'verb_type', 'verb_class', 'number', 'person', 'polite']
      }
 
     init = function() {

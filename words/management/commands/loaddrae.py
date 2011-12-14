@@ -62,14 +62,14 @@ class Command(BaseCommand):
                     else:
                         entries = LexicalEntry.objects.filter(word=word)
                         entries.update(verb_trans=intransitive)
-                elif (u"interjección" in lemma["abrvs"]
-                    and word not in interjections):
-                    entry = LexicalEntry()
-                    entry.category = category_interj
-                    entry.user = user
-                    entry.lemma = word
-                    entry.word = word
-                    entry.save()
+#                elif (u"interjección" in lemma["abrvs"]
+#                    and word not in interjections):
+#                    entry = LexicalEntry()
+#                    entry.category = category_interj
+#                    entry.user = user
+#                    entry.lemma = word
+#                    entry.word = word
+#                    entry.save()
                 if cont % 1000 == 0:
                     try:
                         self.stdout.write(u"...%s (%s)\n" % (cont, word))
