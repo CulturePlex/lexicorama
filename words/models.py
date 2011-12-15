@@ -409,9 +409,9 @@ class LexicalEntry(models.Model):
             if feature_value:
                 feature_value_display = getattr(self, "get_%s_display"
                                                         % feature)()
-                feature = u"<strong style='color: #666'>%s</strong>: %s" \
+                feature = u"%s: <strong style='color: #666'>%s</strong>" \
                           % (feature_display, feature_value_display)
             else:
-                feature = u"%s: (None)" % (feature_display)
+                feature = u"%s: (<em>None</em>)" % (feature_display)
             features.append(feature)
         return u", ".join(features)
