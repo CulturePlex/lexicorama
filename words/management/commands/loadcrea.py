@@ -63,4 +63,4 @@ class Command(BaseCommand):
                 self.stdout.write(u"...%s (%s)\n" % (cont, word))
             cont += 1
         file_descr.close()
-        excep_descr.clos()
+        excep_descr.close()
