@@ -28,11 +28,12 @@ class Command(BaseCommand):
         if not args:
             raise CommandError("All the parameters must be provided.")
         file_name = args[0]
+        file_descr = None
         try:
             file_descr = open(file_name, "r")
         except IOError, e:
             self.stdout.write("File not found: \"%s\"\n" % file_name)
-        cont = 0
+        cont = 1
         entries = []
         excep_descr = None
         exceptions_file = options["exceptions_file"]
@@ -62,3 +63,4 @@ class Command(BaseCommand):
                 self.stdout.write(u"...%s (%s)\n" % (cont, word))
             cont += 1
         file_descr.close()
+        excep_descr.clos()
