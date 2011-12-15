@@ -84,7 +84,13 @@
     {% autoescape off %}
     <li>
     <dt>
-        <span class="label">{{ entry.get_category_display }}</span> <span class="logofont">{{ entry.word }}</span>. ({{ entry.lemma }})
+        <span class="label">{{ entry.get_category_display }}</span> 
+        {% if entry.notes %}
+        <span class="logofont"><a href="http://buscon.rae.es/draeI/SrvltGUIVerbos?IDVERBO={{ entry.notes }}">{{ entry.word }}</a></span>,
+        {% else %}
+        <span class="logofont">{{ entry.word }}</span>,
+        {% endif %}
+        (<a href="http://dirae.es/palabras/{{ entry.lemma }}">{{ entry.lemma }}</a>).
     </dt>
     <dd>
         {{ entry.get_features_display }}
