@@ -41,7 +41,8 @@ class LexicalEntryForm(forms.ModelForm):
 
     class Meta:
         model = LexicalEntry
-        exclude = ("word", "frequency", "lemma", "definition", "user", "eagle")
+        exclude = ("word", "frequency", "lemma", "definition", "user", "eagle",
+                   "notes")
         widgets = {"category": forms.Select(attrs={"class": "category"})}
         for field in LexicalEntry.CATEGORY_FIELDS.values():
             for value in field:
