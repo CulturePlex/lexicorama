@@ -48,8 +48,9 @@ class Command(BaseCommand):
             pos, word, abs_freq, freq = line.split("\t")
             word = word.strip()
             freq = float(freq)
-            entries.append((LexicalEntry.objects.filter(word=word), freq))
-            if not entries and excep_descr:
+            entry_objects = LexicalEntry.objects.filter(word=word)
+            entries.append((entry_objects, freq))
+            if entry_objects.count() > 0 and excep_descr:
                 dic = {
                     "word": word,
                     "frequency": freq,
