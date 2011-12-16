@@ -9,7 +9,7 @@
                 $("form#search").submit();
                 return true;
             }
-        });
+        }).focus();
 
         $(".reset-facets").click(function(e) {
             $(".facet").prop('checked', false);
