@@ -16,7 +16,7 @@ class LexicalEntryAdmin(admin.ModelAdmin):
     list_filter = ('user', 'date', 'category')
     date_hierarchy = 'date'
     # list_editable = ('lemma', 'category', 'gender', 'number', 'person')
-    save_as = False
+    save_as = True
 
     def save_model(self, request, obj, form, change):
         obj.user = request.user
