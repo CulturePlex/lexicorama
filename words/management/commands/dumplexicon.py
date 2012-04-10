@@ -48,28 +48,51 @@ class Command(BaseCommand):
         increment = options.get("increment", 75000)
         min_rows = 0
         max_rows = LexicalEntry.objects.filter(**filter_kwargs).count() + increment
-        if file_descr:
-            cont = 0
-            while min_rows <= max_rows:
-                for entry in LexicalEntry.objects.filter(**filter_kwargs)[min_rows:min_rows + increment]:
-                    file_descr.write(u"%s\n" % json.dumps(self.print_entry(entry)))
-                    if cont % 1000 == 0:
+        if options["sintagma"]:
+            if file_descr:
+                cont = 0
+                while min_rows <= max_rows:
+                    for entry in LexicalEntry.objects.filter(**filter_kwargs)[min_rows:min_rows + increment]:
+                        file_descr.write("%s\n" % self.print_entry_sintagma(entry))
+                        if cont % 1000 == 0:
+                            try:
+                                self.stdout.write(u"...%s (%s)\n" % (cont, entry.word))
+                            except:
+                                print u"...%s (%s)" % (cont, entry.word)
+                        cont += 1
+                    min_rows += increment
+                file_descr.close()
+            else:
+                while min_rows <= max_rows:
+                    for entry in LexicalEntry.objects.filter(**filter_kwargs)[min_rows:min_rows + increment]:
                         try:
-                            self.stdout.write(u"...%s (%s)\n" % (cont, entry.word))
+                            self.stdout.write("%s\n" % self.print_entry_sintagma(entry))
                         except:
-                            print u"...%s (%s)" % (cont, entry.word)
-                    cont += 1
-                min_rows += increment
-            file_descr.close()
+                            print "%s\n" % self.print_entry_sintagma(entry)
+                    min_rows += increment
         else:
-            while min_rows <= max_rows:
-                for entry in LexicalEntry.objects.filter(**filter_kwargs)[min_rows:min_rows + increment]:
-                    try:
-                        self.stdout.write(u"%s\n" \
-                                          % json.dumps(self.print_entry(entry)))
-                    except:
-                        print u"%s" % json.dumps(self.print_entry(entry))
-                min_rows += increment
+            if file_descr:
+                cont = 0
+                while min_rows <= max_rows:
+                    for entry in LexicalEntry.objects.filter(**filter_kwargs)[min_rows:min_rows + increment]:
+                        file_descr.write(u"%s\n" % json.dumps(self.print_entry(entry)))
+                        if cont % 1000 == 0:
+                            try:
+                                self.stdout.write(u"...%s (%s)\n" % (cont, entry.word))
+                            except:
+                                print u"...%s (%s)" % (cont, entry.word)
+                        cont += 1
+                    min_rows += increment
+                file_descr.close()
+            else:
+                while min_rows <= max_rows:
+                    for entry in LexicalEntry.objects.filter(**filter_kwargs)[min_rows:min_rows + increment]:
+                        try:
+                            self.stdout.write(u"%s\n" \
+                                              % json.dumps(self.print_entry(entry)))
+                        except:
+                            print u"%s" % json.dumps(self.print_entry(entry))
+                    min_rows += increment
 
     def print_entry(self, entry):
         dic = {
@@ -81,3 +104,17 @@ class Command(BaseCommand):
             "features": entry.get_features(),
         }
         return dic
+    
+    def print_entry_sintagma(self, entry):
+        output = "(\"" + entry.word + "\", " + entry.category.upper() + "0, " + self.print_features_sintagma(entry) + ")"
+        return output.encode("latin1")
+    
+    def print_features_sintagma(self, entry):
+        output = "("
+        features = entry.get_features()
+        keys = features.keys()
+        for k in keys: 
+            output += k + ":\'" + features[k] + "\', "
+        output += "lemma:\'" + entry.lemma + "\', flexion:\'" + entry.word + "\'"
+        output += ")"
+        return output
