@@ -120,5 +120,5 @@ class Command(BaseCommand):
                 #output += key + ":\'" + val + "\', "
                 output += "%s:\'%s\', " % (key, val)
         #output += "lemma:\'" + entry.lemma + "\', flexion:\'" + entry.word + "\'"
-        output += "lemma:\'%s\', flexion:\'%s\')" % (entry.lemma, entry.word)
+        output += "lemma:\'%s\')" % entry.lemma
         return output
