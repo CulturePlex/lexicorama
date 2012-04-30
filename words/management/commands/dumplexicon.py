@@ -15,6 +15,11 @@ class Command(BaseCommand):
             dest='sintagma',
             default=False,
             help='Dumps the output according to Sintagma format.'),
+        make_option('--no-polite-verbs',
+            action='store_true',
+            dest='no_polite_verbs',
+            default=False,
+            help='Dumps excluding polite forms of verbs.'),
         make_option('--only-verbs',
             action='store_true',
             dest='only_verbs',
@@ -45,14 +50,20 @@ class Command(BaseCommand):
             filter_kwargs = {
                 "category": LexicalEntry.CATEGORY_VERB,
             }
+        exclude_kwargs = {}
+        if options["no_polite_verbs"]:
+            exclude_kwargs = {
+                "category": LexicalEntry.CATEGORY_VERB,
+                "polite": LexicalEntry.POLITE_POLITE
+            }
         increment = options.get("increment", 75000)
         min_rows = 0
-        max_rows = LexicalEntry.objects.filter(**filter_kwargs).count() + increment
+        max_rows = LexicalEntry.objects.filter(**filter_kwargs).exclude(**exclude_kwargs).count() + increment
         if options["sintagma"]:
             if file_descr:
                 cont = 0
                 while min_rows <= max_rows:
-                    for entry in LexicalEntry.objects.filter(**filter_kwargs)[min_rows:min_rows + increment]:
+                    for entry in LexicalEntry.objects.filter(**filter_kwargs).exclude(**exclude_kwargs)[min_rows:min_rows + increment]:
                         file_descr.write("%s\n" % self.print_entry_sintagma(entry))
                         if cont % 1000 == 0:
                             try:
@@ -64,7 +75,7 @@ class Command(BaseCommand):
                 file_descr.close()
             else:
                 while min_rows <= max_rows:
-                    for entry in LexicalEntry.objects.filter(**filter_kwargs)[min_rows:min_rows + increment]:
+                    for entry in LexicalEntry.objects.filter(**filter_kwargs).exclude(**exclude_kwargs)[min_rows:min_rows + increment]:
                         try:
                             self.stdout.write("%s\n" % self.print_entry_sintagma(entry))
                         except:
@@ -74,7 +85,7 @@ class Command(BaseCommand):
             if file_descr:
                 cont = 0
                 while min_rows <= max_rows:
-                    for entry in LexicalEntry.objects.filter(**filter_kwargs)[min_rows:min_rows + increment]:
+                    for entry in LexicalEntry.objects.filter(**filter_kwargs).exclude(**exclude_kwargs)[min_rows:min_rows + increment]:
                         file_descr.write(u"%s\n" % json.dumps(self.print_entry(entry)))
                         if cont % 1000 == 0:
                             try:
@@ -86,7 +97,7 @@ class Command(BaseCommand):
                 file_descr.close()
             else:
                 while min_rows <= max_rows:
-                    for entry in LexicalEntry.objects.filter(**filter_kwargs)[min_rows:min_rows + increment]:
+                    for entry in LexicalEntry.objects.filter(**filter_kwargs).exclude(**exclude_kwargs)[min_rows:min_rows + increment]:
                         try:
                             self.stdout.write(u"%s\n" \
                                               % json.dumps(self.print_entry(entry)))
@@ -119,6 +130,8 @@ class Command(BaseCommand):
             if val:
                 #output += key + ":\'" + val + "\', "
                 output += "%s:\'%s\', " % (key, val)
-        #output += "lemma:\'" + entry.lemma + "\', flexion:\'" + entry.word + "\'"
+        #output += "lemma:\'" + entry.lemma + "\', flexion:\'" + entry.word + "\')"
+        #output += "lemma:\'%s\', flexion:\'%s\')" % (entry.lemma, entry.word)
+        #output += "lemma:\'" + entry.lemma + "\')"
         output += "lemma:\'%s\')" % entry.lemma
         return output
