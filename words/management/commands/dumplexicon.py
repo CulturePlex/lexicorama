@@ -117,7 +117,6 @@ class Command(BaseCommand):
         return dic
     
     def print_entry_sintagma(self, entry):
-        #output = "(\"" + entry.word + "\", " + entry.category.upper() + "0, " + self.print_features_sintagma(entry) + ")"
         output = "(\"%s\", %s0, %s)" % (entry.word, entry.category.upper(), self.print_features_sintagma(entry))
         return output.encode("latin1")
     
@@ -128,10 +127,6 @@ class Command(BaseCommand):
         for key in keys:
             val = features[key]
             if val:
-                #output += key + ":\'" + val + "\', "
                 output += "%s:\'%s\', " % (key, val)
-        #output += "lemma:\'" + entry.lemma + "\', flexion:\'" + entry.word + "\')"
-        output += "lemma:\'%s\', flexion:\'%s\')" % (entry.lemma, entry.word)
-        #output += "lemma:\'" + entry.lemma + "\')"
-        #output += "lemma:\'%s\')" % entry.lemma
+        output += "lemma:\'%s\', flexion:\'%s\')" % (entry.lemma, entry.word.lower())
         return output
