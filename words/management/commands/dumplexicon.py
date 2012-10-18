@@ -117,7 +117,7 @@ class Command(BaseCommand):
         return dic
     
     def print_entry_sintagma(self, entry):
-        output = "(\"%s\", %s0, %s)" % (entry.word, entry.category.upper(), self.print_features_sintagma(entry))
+        output = "(\"%s\", %s0, %s)" % (entry.word.lower(), entry.category.upper(), self.print_features_sintagma(entry))
         return output.encode("latin1")
     
     def print_features_sintagma(self, entry):
